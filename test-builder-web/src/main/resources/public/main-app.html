@@ -1,0 +1,124 @@
+<!--<link rel="import" href="webjars/polymer/2.2.0/polymer.html">-->
+<!--<link rel="import" href="webjars/polymer/2.2.0/polymer-element.html">-->
+<link rel="import" href="libs/polymer-elements/polymer/polymer-element.html">
+<link rel="import" href="libs/polymer-elements/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="libs/polymer-elements/iron-ajax/iron-ajax.html">
+<link rel="import" href="libs/polymer-elements/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="libs/polymer-elements/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="libs/polymer-elements/app-layout/app-header/app-header.html">
+<link rel="import" href="libs/polymer-elements/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="libs/polymer-elements/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="libs/polymer-elements/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="libs/polymer-elements/app-route/app-location.html">
+<link rel="import" href="libs/polymer-elements/app-route/app-route.html">
+<link rel="import" href="libs/polymer-elements/iron-pages/iron-pages.html">
+<link rel="import" href="libs/polymer-elements/iron-selector/iron-selector.html">
+<link rel="import" href="libs/polymer-elements/paper-styles/paper-styles.html">
+<link rel="import" href="libs/polymer-elements/iron-flex-layout/iron-flex-layout-classes.html">
+
+<dom-module id="main-app">
+    <template>
+        <style include="iron-flex">
+            .vertical-layout {
+                @apply(--layout-vertical)
+            }
+            :host {
+                height: 100%;
+                background-color: var(--google-grey-500);
+            }
+            .main-container {
+                height: 100%;
+            }
+            .layout {
+                display: flex;
+            }
+        </style>
+
+        <app-location
+                route="{{route}}"
+                url-space-regex="^[[rootPath]]"
+                use-hash-as-path>
+        </app-location>
+
+        <app-route
+                route="{{route}}"
+                pattern="[[rootPath]]:page"
+                data="{{routeData}}"
+                tail="{{subroute}}">
+        </app-route>
+
+        <iron-pages
+                class="main-container"
+                selected="[[page]]"
+                attr-for-selected="name"
+                fallback-selection="view404"
+                role="main">
+            <profile-page roles="[[roles]]" name="profile" route-data="[[routeData]]"></profile-page>
+            <login-page roles="{{roles}}" class="layout center-center" name="login"></login-page>
+            <users-page roles="[[roles]]" name="users" route-data="[[routeData]]"></users-page>
+        </iron-pages>
+
+        <!--<iron-ajax auto url="/api/test"></iron-ajax>-->
+
+
+    </template>
+
+    <script>
+        class Main extends Polymer.Element {
+            static get is() { return 'main-app'; }
+
+            static get properties() {
+                return {
+                    roles: Array,
+                    page: {
+                        type: String,
+                        reflectToAttribute: true,
+                        observer: '_pageChanged',
+                    },
+                    routeData: Object,
+                    subroute: String,
+                    // This shouldn't be neccessary, but the Analyzer isn't picking up
+                    // Polymer.Element#rootPath
+                    rootPath: String,
+                };
+            }
+
+            static get observers() {
+                return [
+                    '_routePageChanged(routeData.page)',
+                ];
+            }
+
+            _routePageChanged(page) {
+                console.log('[main-app] Page: ' + page);
+
+                // If no page was found in the route data, page will be an empty string.
+                // Default to 'view1' in that case.
+                this.page = page || 'profile';
+
+                window.location.hash = '/' + this.page;
+
+                // Close a non-persistent drawer when the page & route are changed.
+                // if (!this.$.drawer.persistent) {
+                //     this.$.drawer.close();
+                // }
+            }
+
+            _pageChanged(page) {
+                // Load page import on demand. Show 404 page if fails
+                let resolvedPageUrl = this.resolveUrl(page + '-page.html');
+                Polymer.importHref(
+                    resolvedPageUrl,
+                    null,
+                    this._showPage404.bind(this),
+                    true);
+            }
+
+            _showPage404() {
+                // this.page = 'view404';
+            }
+        }
+
+        window.customElements.define(Main.is, Main);
+    </script>
+</dom-module>

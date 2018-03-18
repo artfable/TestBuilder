@@ -1,0 +1,104 @@
+<link rel="import" href="libs/polymer-elements/polymer/polymer-element.html">
+<link rel="import" href="libs/polymer-elements/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="libs/polymer-elements/app-layout/app-layout.html">
+<link rel="import" href="libs/polymer-elements/paper-button/paper-button.html">
+
+<link rel="import" href="libs/polymer-elements/iron-ajax/iron-ajax.html">
+
+<link rel="import" href="custom-styles.html">
+
+<dom-module id="menu-element">
+    <template>
+        <style import="custom-styles">
+            app-toolbar {
+                background-color: var(--dark-theme-background-color);
+                color: var(--dark-theme-text-color);
+            }
+            a {
+                text-decoration: none;
+                color: var(--dark-theme-text-color);
+            }
+            a.active {
+                background-color: var(--dark-theme-background-active-color);
+                color: var(--dark-theme-active-text-color);
+            }
+            .right-with-start {
+                margin-left: auto;
+            }
+            .special-action {
+                color: var(--dark-theme-special-toolbar-action-color);
+            }
+        </style>
+
+        <app-header>
+            <app-toolbar>
+                <template is="dom-repeat" items="{{PAGES}}">
+                    <template is="dom-if" if="{{_checkRole(item.role, roles)}}">
+                        <a href="#/[[item.id]]" class$="{{_resolveActiveClass(item, page)}}">
+                            <paper-button>[[item.name]]</paper-button>
+                        </a>
+                    </template>
+                </template>
+                <paper-button class="right-with-start special-action" on-click="onLogout">Logout</paper-button>
+            </app-toolbar>
+        </app-header>
+
+        <iron-ajax id="logout" url="/api/logout/" handle-as="json" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
+
+    </template>
+
+    <script>
+        class MenuElement extends Polymer.Element {
+            static get is() { return 'menu-element'; }
+
+            static get properties() {
+                return {
+                    page: String,
+                    roles: Array,
+                    PAGES: {
+                        value() {
+                            return [
+                                {id: 'profile', name: 'Profile'},
+                                {id: 'users', name: 'Users', role: 'ADMIN'}
+                            ];
+                        }
+                    }
+                };
+            }
+
+            _resolveActiveClass(item, page) {
+                return page == item.id ? 'active' : null;
+            }
+
+            _checkRole(role, roles) {
+                if (!role) {
+                    return true;
+                }
+
+                if (!roles || !roles.length) {
+                    return false;
+                }
+
+                return roles.includes(role);
+            }
+
+            _handleResponse(event, response) {
+                console.error(response);
+            }
+
+            _handleError(event, detail) {
+                if (detail.request.status == 401) {
+                    location.hash = '/login';
+                    return;
+                }
+                console.error(detail);
+            }
+
+            onLogout() {
+                this.$.logout.generateRequest();
+            }
+        }
+
+        window.customElements.define(MenuElement.is, MenuElement);
+    </script>
+</dom-module>

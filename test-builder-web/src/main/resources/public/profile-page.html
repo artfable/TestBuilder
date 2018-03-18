@@ -1,0 +1,82 @@
+<link rel="import" href="libs/polymer-elements/polymer/polymer-element.html">
+<link rel="import" href="libs/polymer-elements/iron-ajax/iron-ajax.html">
+<link rel="import" href="libs/polymer-elements/app-layout/app-layout.html">
+<link rel="import" href="libs/polymer-elements/paper-button/paper-button.html">
+<link rel="import" href="libs/polymer-elements/paper-card/paper-card.html">
+
+<link rel="import" href="libs/polymer-elements/paper-styles/paper-styles.html">
+<link rel="import" href="libs/polymer-elements/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="menu-element.html">
+
+<dom-module id="profile-page">
+    <template>
+        <style include="iron-flex iron-flex-alignment">
+            .layout {
+                display: flex;
+            }
+            .container {
+                padding-top: 2rem;
+            }
+            .container paper-card {
+                width: 75%;
+            }
+        </style>
+
+        <menu-element roles="[[roles]]" page="profile"></menu-element>
+
+        <div class="layout center-center container">
+            <paper-card>
+                <div class="card-content">
+                    <h3>User: [[profile.login]]</h3>
+                    <p>[[profile.name]] [[profile.lastName]] [[profile.patronymic]]</p>
+                </div>
+            </paper-card>
+        </div>
+
+        <iron-ajax id="currentUserRequest" url="/api/users/current" handle-as="json" on-response="_handleProfile" on-error="_handleError"></iron-ajax>
+    </template>
+
+    <script>
+        class ProfilePage extends Polymer.Element {
+            static get is() { return 'profile-page'; }
+
+            static get properties() {
+                return {
+                    roles: Array,
+                    profile: Object,
+                    routeData: {
+                        type: Object,
+                        observer: '_routeChanged',
+                        reflectToAttribute: true
+                    },
+                    rootPath: String
+                };
+            }
+
+            _routeChanged(routeData) {
+                if (routeData.page == 'profile') {
+                    this.$.currentUserRequest.generateRequest();
+                }
+            }
+
+            _handleProfile(event, response) {
+                this.set('profile', response.parseResponse());
+            }
+
+            _handleError(event, detail) {
+                if (detail.request.status == 401) {
+                    // let resolvedPageUrl = this.resolveUrl('login-page.html');
+                    // Polymer.importHref(
+                    //     resolvedPageUrl,
+                    //     null,
+                    //     null,
+                    //     true);
+                    location.hash = '/login'
+                }
+            }
+        }
+
+        window.customElements.define(ProfilePage.is, ProfilePage);
+    </script>
+</dom-module>

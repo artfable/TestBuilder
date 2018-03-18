@@ -1,0 +1,101 @@
+<link rel="import" href="libs/polymer-elements/polymer/polymer-element.html">
+<link rel="import" href="libs/polymer-elements/iron-ajax/iron-ajax.html">
+<link rel="import" href="libs/polymer-elements/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="libs/polymer-elements/paper-styles/color.html">
+<link rel="import" href="libs/polymer-elements/paper-styles/typography.html">
+<link rel="import" href="libs/polymer-elements/paper-card/paper-card.html">
+<link rel="import" href="libs/polymer-elements/paper-input/paper-input.html">
+<link rel="import" href="libs/polymer-elements/paper-button/paper-button.html">
+<link rel="import" href="libs/polymer-elements/paper-dialog/paper-dialog.html">
+
+<link rel="import" href="libs/polymer-elements/paper-styles/paper-styles.html">
+<link rel="import" href="libs/polymer-elements/iron-flex-layout/iron-flex-layout-classes.html">
+
+<script src="libs/md5.min.js"></script>
+
+<dom-module id="login-page">
+    <template>
+        <style include="iron-flex iron-flex-alignment">
+            .login-card {
+                width: 20%;
+            }
+            :host {
+                height: 100%;
+                background-color: var(--dark-theme-background-color);
+            }
+            .login-btn {
+                background-color: var(--paper-indigo-500);
+            }
+        </style>
+
+        <paper-card class="login-card">
+            <div class="card-content">
+                <paper-input label="Login" value="{{login.name}}" invalid="[[invalid]]"></paper-input>
+                <paper-input label="Password" value="{{login.pas}}" invalid="[[invalid]]" error-message="Login or password is incorrect!"></paper-input>
+            </div>
+            <div class="card-actions">
+                <div class="layout horizontal end-justified">
+                    <paper-button raised class="login-btn" on-click="_handleLoginInput">Login</paper-button>
+                </div>
+            </div>
+        </paper-card>
+
+        <paper-dialog id="modal" modal>
+            <p>Server-side error. Please try later or call to the business support.</p>
+            <div class="buttons">
+                <paper-button dialog-confirm autofocus>Close</paper-button>
+            </div>
+        </paper-dialog>
+    </template>
+
+    <script>
+        class LoginPage extends Polymer.Element {
+            static get is() { return 'login-page'; }
+
+            static get properties() {
+                return {
+                    rootPath: String,
+                    login: {
+                        type: Object,
+                        notify: true,
+                        value: {}
+                    },
+                    invalid: {
+                        type: Boolean,
+                        notify: true,
+                        value: false
+                    },
+                    roles: {
+                        type: Array,
+                        reflectToAttribute: true,
+                        notify: true
+                    }
+                };
+            }
+
+            _handleLoginInput(event) {
+                let formData = new FormData();
+                formData.append('username', this.get("login.name"));
+                formData.append('password', md5(this.get("login.pas")));
+
+                let request = document.createElement('iron-request');
+                request.send({
+                    url: '/api/login/',
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    this.set('roles', response.parseResponse());
+                    location.hash = '/profile';
+                }, () => {
+                    if (request.xhr.status == 401) {
+                        this.set('invalid', true);
+                    } else {
+                        this.$.modal.open();
+                    }
+                })
+            }
+        }
+
+        window.customElements.define(LoginPage.is, LoginPage);
+    </script>
+</dom-module>

@@ -1,0 +1,4 @@
+rootProject.name = 'test-builder'
+include 'test-builder-web'
+include 'test-builder-core'
+

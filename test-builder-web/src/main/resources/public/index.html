@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" unresolved>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <script>
+        /**
+         * [polymer-root-path]
+         *
+         * By default, we set `Polymer.rootPath` to the server root path (`/`).
+         * Leave this line unchanged if you intend to serve your app from the root
+         * path (e.g., with URLs like `my.domain/` and `my.domain/view1`).
+         *
+         * If you intend to serve your app from a non-root path (e.g., with URLs
+         * like `my.domain/my-app/` and `my.domain/my-app/view1`), edit this line
+         * to indicate the path from which you'll be serving, including leading
+         * and trailing slashes (e.g., `/my-app/`).
+         */
+        window.Polymer = {rootPath: '/'};
+
+        // Load and register pre-caching Service Worker
+        // if ('serviceWorker' in navigator) {
+        //     window.addEventListener('load', function() {
+        //         navigator.serviceWorker.register('service-worker.js', {
+        //             scope: Polymer.rootPath
+        //         });
+        //     });
+        // }
+    </script>
+
+    <script src="webjars/github-com-webcomponents-webcomponentsjs/v1.0.2/webcomponents-loader.js"></script>
+
+    <link rel="import" href="libs/polymer-elements/paper-styles/paper-styles.html">
+
+    <link rel="import" href="main-app.html">
+
+    <style>
+        html, body {
+            height: 100%;
+        }
+        body {
+            /*font-family: 'Roboto', 'Noto', sans-serif;*/
+            /*font-size: 14px;*/
+            /*margin: 0;*/
+            /*padding: 24px;*/
+            /*background-color: var(--dark-theme-background-color);*/
+            margin: 0;
+            padding: 0;
+        }
+        @font-face {
+            font-family: 'Font Awesome 5 Free';
+            font-style: normal;
+            font-weight: 400;
+            src: url("webjars/font-awesome/5.0.6/web-fonts-with-css/webfonts/fa-regular-400.eot");
+            src: url("webjars/font-awesome/5.0.6/web-fonts-with-css/webfonts/fa-regular-400.eot?#iefix") format("embedded-opentype"),
+                url("webjars/font-awesome/5.0.6/web-fonts-with-css/webfonts/fa-regular-400.woff2") format("woff2"),
+                url("webjars/font-awesome/5.0.6/web-fonts-with-css/webfonts/fa-regular-400.woff") format("woff"),
+                url("webjars/font-awesome/5.0.6/web-fonts-with-css/webfonts/fa-regular-400.ttf") format("truetype"),
+                url("webjars/font-awesome/5.0.6/web-fonts-with-css/webfonts/fa-regular-400.svg#fontawesome") format("svg"); }
+
+        .far, .fa {
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 400; }
+
+    </style>
+</head>
+<body unresolved>
+    <main-app></main-app>
+    <!--<div>-->
+        <!--<img src="https://scontent.cdninstagram.com/t51.2885-15/s320x320/sh0.08/e35/20180618_770013376505578_3385499729029758976_n.jpg">-->
+    <!--</div>-->
+</body>
+</html>

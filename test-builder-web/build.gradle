@@ -1,0 +1,38 @@
+apply plugin: 'artfable.sass'
+apply plugin: 'org.springframework.boot'
+
+dependencies {
+    compile project(":test-builder-core")
+
+    compile 'org.webjars.bower:github-com-webcomponents-shadycss:v1.0.0'
+    compile 'org.webjars.bower:github-com-webcomponents-webcomponentsjs:v1.0.2' // some problem with webjars
+    compile 'org.webjars.bower:polymer:2.2.0'
+//    compile 'org.webjars:polymer-elements-all:0.1.0'
+
+//    compile 'org.webjars.npm:fontawesome:4.7.2'
+    compile 'org.webjars:font-awesome:5.0.6'
+
+    compile 'org.jetbrains.kotlin:kotlin-stdlib'
+    compile 'org.springframework.boot:spring-boot-starter-web'
+}
+
+sourceSets {
+    main {
+        resources {
+            exclude 'sass'
+        }
+    }
+}
+
+jar {
+    includeEmptyDirs = false
+}
+
+sass {
+    group {
+        sourceDir = "$projectDir/src/main/resources/sass"
+        outputDir = "${buildDir}/resources/main/public/css"
+    }
+}
+
+build.dependsOn "compileSass"

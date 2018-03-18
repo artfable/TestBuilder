@@ -1,0 +1,66 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="security-1" author="artfable">
+        <createTable tableName="USERS">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" unique="true"/>
+            </column>
+            <column name="login" type="varchar2(64)">
+                <constraints unique="true"/>
+            </column>
+            <column name="name" type="varchar2(128)"/>
+            <column name="lastname" type="varchar2(128)"/>
+            <column name="patronymic" type="varchar2(128)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="security-2" author="artfable">
+        <addColumn tableName="USERS">
+            <column name="password" type="varchar2(256)"/>
+        </addColumn>
+
+        <renameColumn tableName="USERS" oldColumnName="lastname" newColumnName="last_name"/>
+
+        <insert tableName="USERS">
+            <column name="login" value="admin"/>
+            <column name="password" value="1b57dffa91cdad3159d345bc86b1b7b90a291ef3"/>
+        </insert>
+
+        <createTable tableName="RIGHTS">
+            <column name="name" type="varchar2(64)">
+                <constraints primaryKey="true" unique="true"/>
+            </column>
+            <column name="description" type="varchar2(256)"/>
+        </createTable>
+
+        <createTable tableName="USERS_RIGHTS">
+            <column name="user_id" type="BIGINT">
+                <constraints foreignKeyName="FK_USERS_RIGHTS_USER_ID"
+                             referencedTableName="USERS"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="right" type="varchar2(64)">
+                <constraints foreignKeyName="FK_USERS_RIGHTS_RIGHT"
+                             referencedTableName="RIGHTS"
+                             referencedColumnNames="name"/>
+            </column>
+        </createTable>
+    </changeSet>
+    
+    <changeSet id="security-3" author="aveselov">
+        <insert tableName="RIGHTS">
+            <column name="name" value="ADMIN"/>
+            <column name="description" value="Full control of the application"/>
+        </insert>
+
+        <sql>
+            INSERT INTO USERS_RIGHTS (USER_ID, RIGHT) VALUES ((SELECT id FROM USERS WHERE login = 'admin'), 'ADMIN');
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

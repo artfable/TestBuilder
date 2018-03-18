@@ -1,0 +1,250 @@
+<link rel="import" href="libs/polymer-elements/polymer/polymer-element.html">
+<link rel="import" href="libs/polymer-elements/iron-ajax/iron-ajax.html">
+<link rel="import" href="libs/polymer-elements/app-layout/app-layout.html">
+<link rel="import" href="libs/polymer-elements/paper-button/paper-button.html">
+<link rel="import" href="libs/polymer-elements/paper-card/paper-card.html">
+<link rel="import" href="libs/polymer-elements/paper-input/paper-input.html">
+<link rel="import" href="libs/polymer-elements/paper-dialog/paper-dialog.html">
+
+<link rel="import" href="libs/polymer-elements/paper-styles/paper-styles.html">
+<link rel="import" href="libs/polymer-elements/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="menu-element.html">
+
+<script src="libs/md5.min.js"></script>
+
+<dom-module id="users-page">
+    <link rel="import" type="css" href="webjars/font-awesome/5.0.6/web-fonts-with-css/css/fa-regular.min.css">
+    <link rel="import" type="css" href="webjars/font-awesome/5.0.6/web-fonts-with-css/css/fontawesome.min.css">
+    <template>
+        <style include="iron-flex iron-flex-alignment">
+            .layout {
+                display: flex;
+            }
+            .container {
+                padding-top: 2rem;
+            }
+            .container paper-card {
+                width: 75%;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            td, th {
+                text-align: center;
+                padding: 0.8rem;
+            }
+            thead > tr, tr:not(:last-of-type) {
+                border-bottom: 1px solid var(--dark-theme-table-border-color);
+            }
+            thead > tr > th:first-of-type {
+                border-top-left-radius: 5px;
+            }
+            thead > tr > th:last-of-type {
+                border-top-right-radius: 5px;
+            }
+            tbody > tr:last-of-type > td:first-of-type {
+                border-bottom-left-radius: 5px;
+            }
+            tbody > tr:last-of-type > td:last-of-type {
+                border-bottom-right-radius: 5px;
+            }
+            tr:hover {
+                background-color: var(--dark-theme-hover-color);
+            }
+            td:not(:last-child), th:not(:last-child) {
+                border-right: 1px solid var(--dark-theme-table-border-color);
+            }
+            th:last-of-type,td:last-of-type,th:first-of-type,td:first-of-type {
+                width: 10%;
+            }
+            .card-action {
+                padding: 0.2rem;
+            }
+            .primary-btn {
+                background-color: var(--dark-theme-primary-button-color);
+            }
+            .small-dialog {
+                width: 40rem;
+            }
+
+            .remove-icon {
+                color: var(--dark-theme-remove-icon-color);
+            }
+        </style>
+
+        <menu-element roles="[[roles]]" page="users"></menu-element>
+
+        <div class="layout center-center container">
+            <paper-card>
+                <div class="card-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Login</th>
+                                <th>Roles</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template is="dom-repeat" items="{{users}}">
+                                <tr>
+                                    <td>[[item.id]]</td>
+                                    <td>[[item.login]]</td>
+                                    <td>[[item.roles]]</td>
+                                    <td>
+                                        <paper-button class="remove-icon" on-click="removeUser">
+                                            <i class="far fa-trash-alt"></i>
+                                        </paper-button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-action">
+                    <div class="layout horizontal end-justified">
+                        <paper-button on-click="createUser" class="primary-btn">Create new</paper-button>
+                    </div>
+                </div>
+            </paper-card>
+        </div>
+
+        <paper-dialog id="createUser" no-cancel-on-outside-click with-backdrop class="small-dialog">
+            <div>
+                <paper-input label="Login" auto-validate="true" value="{{newUser.login}}" autofocus
+                             pattern="\w{3,15}" error-message="Should be in 3-15 letters and only English letters or numbers"></paper-input>
+                <paper-input label="Password" type="password" value="{{newUser.password}}"></paper-input>
+                <paper-input label="Repeat Password" type="password" value="{{newUser.repeat}}" invalid="[[passwordInvalid]]"
+                             error-message="Should be the same as first one"></paper-input>
+            </div>
+            <div class="buttons">
+                <paper-button dialog-confirm disabled="[[passwordInvalid]]" on-click="_onSaveNewUser">Save</paper-button>
+                <paper-button dialog-dismiss>Close</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="error" modal>
+            <p>Server-side error. Please try later or call to the business support.</p>
+            <div class="buttons">
+                <paper-button dialog-confirm autofocus>Close</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="userCreateError" modal>
+            <p>The login name is already used. Please provide another.</p>
+            <div class="buttons">
+                <paper-button dialog-confirm autofocus on-click="_repeatCreateUser">OK</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="removeUser" no-cancel-on-outside-click with-backdrop>
+            <p>All user's data will be deleted as well. Are sure that you want to delete user?</p>
+            <div class="buttons">
+                <paper-button dialog-confirm autofocus on-click="_deleteUser">Delete</paper-button>
+                <paper-button dialog-dismiss>Cancel</paper-button>
+            </div>
+        </paper-dialog>
+
+        <iron-ajax id="getUsers" url="/api/users/" handle-as="json" on-response="_handleUsers" on-error="_handleError"></iron-ajax>
+        <iron-ajax id="createNewUser" url="/api/users/" method="POST" content-type="application/json" handle-as="json" on-response="_handleUserChanged" on-error="_handleUserCreateError"></iron-ajax>
+        <iron-ajax id="deleteUser" url="/api/users/[[toDelete]]" method="DELETE" content-type="application/json" handle-as="json" on-response="_handleUserChanged" on-error="_handleError"></iron-ajax>
+    </template>
+
+    <script>
+        class UsersPage extends Polymer.Element {
+            static get is() { return 'users-page'; }
+
+            static get properties() {
+                return {
+                    roles: Array,
+                    routeData: {
+                        type: Object,
+                        observer: '_routeChanged',
+                        reflectToAttribute: true
+                    },
+                    newUser: Object,
+                    passwordInvalid: {
+                        type: Boolean,
+                        computed: '_isInvalid(newUser.password, newUser.repeat)'
+                    },
+                    users: Object,
+                    rootPath: String
+                };
+            }
+
+            _routeChanged(routeData) {
+                if (routeData.page == 'users') {
+                    this.$.getUsers.generateRequest();
+                }
+            }
+
+            _handleUsers(event, response) {
+                this.set('users', response.parseResponse());
+            }
+
+            _handleError(event, detail) {
+                switch (detail.request.status) {
+                    case 401:
+                        location.hash = '/login';
+                        break;
+                    case 500:
+                        this.$.error.open();
+                        break;
+                }
+            }
+
+            _handleUserCreateError(event, detail) {
+                if (detail.request.status == 400) {
+                    this.$.userCreateError.open();
+                    return;
+                }
+
+                this._handleError(event, detail);
+            }
+
+            _isInvalid(password, repeat) {
+                return password != repeat;
+            }
+
+            _onSaveNewUser() {
+                let newUser = this.get('newUser');
+                if (newUser.password != newUser.repeat) {
+                    throw new Error('Password wasn\'t confirmed');
+                }
+
+                let userToSend = {login: newUser.login};
+
+                userToSend.password = md5(newUser.password);
+                this.$.createNewUser.body = userToSend;
+                this.$.createNewUser.generateRequest();
+            }
+
+            _handleUserChanged(event, response) {
+                this.$.getUsers.generateRequest();
+            }
+
+            _repeatCreateUser() {
+                this.$.createUser.open();
+            }
+
+            _deleteUser() {
+                this.$.deleteUser.generateRequest();
+            }
+
+            createUser() {
+                this.set('newUser', {});
+                this.$.createUser.open();
+            }
+
+            removeUser(event) {
+                this.set('toDelete', event.model.get('item.id'));
+                this.$.removeUser.open();
+            }
+        }
+
+        window.customElements.define(UsersPage.is, UsersPage);
+    </script>
+</dom-module>
