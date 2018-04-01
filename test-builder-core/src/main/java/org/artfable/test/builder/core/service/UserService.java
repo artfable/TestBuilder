@@ -4,8 +4,8 @@ import org.artfable.test.builder.core.data.UserRepository;
 import org.artfable.test.builder.core.model.AppUser;
 import org.artfable.test.builder.core.model.UserDetailsDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,11 +24,11 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private ShaPasswordEncoder passwordEncoder;
+    private BCryptPasswordEncoder passwordEncoder;
 
     public AppUser getCurrentUser() {
         UserDetailsDto user = (UserDetailsDto) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userRepository.findOne(user.getId());
+        return userRepository.findById(user.getId()).get();
     }
 
     public List<AppUser> getAllUsers() {
@@ -40,19 +40,19 @@ public class UserService {
             throw new IllegalArgumentException("User with " + user.getLogin() + " already exist");
         }
         AppUser userToSave = new AppUser(null, user.getLogin(),
-                passwordEncoder.encodePassword(user.getPassword(), "some"),
+                passwordEncoder.encode(user.getPassword()),
                 user.getName(), user.getLastName(), user.getPatronymic(), Collections.emptyList());
         return userRepository.saveAndFlush(userToSave);
     }
 
     public AppUser updateUser(AppUser user) {
         AppUser userToSave = new AppUser(user.getId(), user.getLogin(),
-                passwordEncoder.encodePassword(user.getPassword(), "some"),
+                passwordEncoder.encode(user.getPassword()),
                 user.getName(), user.getLastName(), user.getPatronymic(), Collections.emptyList());
         return userRepository.saveAndFlush(userToSave);
     }
 
     public void deleteUser(Long id) {
-        userRepository.delete(id);
+        userRepository.deleteById(id);
     }
 }

@@ -8,23 +8,21 @@ import org.artfable.test.builder.core.model.UserDetailsDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * @author artfable
- *         15.06.17
+ * 15.06.17
  */
 @Service
 public class UserDetailsAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
@@ -38,7 +36,7 @@ public class UserDetailsAuthenticationProvider extends AbstractUserDetailsAuthen
 //    private RoleRepository roleRepository;
 
     @Autowired
-    private ShaPasswordEncoder passwordEncoder;
+    private BCryptPasswordEncoder passwordEncoder;
 
     @Override
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
@@ -51,13 +49,13 @@ public class UserDetailsAuthenticationProvider extends AbstractUserDetailsAuthen
             throw new UsernameNotFoundException("Username wasn't provided");
         }
 
-//        LOG.info("disclose: " + authentication.getCredentials());
-        String password = passwordEncoder.encodePassword((String) authentication.getCredentials(), "some");
-//        LOG.info("disclose: " + password);
+        LOG.info("disclose: " + authentication.getCredentials());
+        String password = passwordEncoder.encode((String) authentication.getCredentials());
+        LOG.info("disclose: " + password);
 
-        AppUser user = userRepository.findByLoginAndPassword(username, password);
+        AppUser user = userRepository.findByLogin(username);
 
-        if (user == null) {
+        if (user == null || !passwordEncoder.matches((String) authentication.getCredentials(), user.getPassword())) {
             throw new UsernameNotFoundException("User with name [" + username + "] not found, or password is invalid");
         }
 

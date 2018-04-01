@@ -52,7 +52,7 @@
         </createTable>
     </changeSet>
     
-    <changeSet id="security-3" author="aveselov">
+    <changeSet id="security-3" author="artfable">
         <insert tableName="RIGHTS">
             <column name="name" value="ADMIN"/>
             <column name="description" value="Full control of the application"/>
@@ -61,6 +61,13 @@
         <sql>
             INSERT INTO USERS_RIGHTS (USER_ID, RIGHT) VALUES ((SELECT id FROM USERS WHERE login = 'admin'), 'ADMIN');
         </sql>
+    </changeSet>
+
+    <changeSet id="security-4" author="artfable">
+        <update tableName="USERS">
+            <column name="password" value="$2a$10$HSk/Lj9XLxX79WdwIXJByuRyab7n0Ik32s0jSjMrdCzHQhpMp9HAW"/>
+            <where>login='admin'</where>
+        </update>
     </changeSet>
 
 </databaseChangeLog>
