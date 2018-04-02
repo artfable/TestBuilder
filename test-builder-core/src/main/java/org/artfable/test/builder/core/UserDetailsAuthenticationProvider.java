@@ -49,9 +49,9 @@ public class UserDetailsAuthenticationProvider extends AbstractUserDetailsAuthen
             throw new UsernameNotFoundException("Username wasn't provided");
         }
 
-        LOG.info("disclose: " + authentication.getCredentials());
-        String password = passwordEncoder.encode((String) authentication.getCredentials());
-        LOG.info("disclose: " + password);
+//        LOG.info("disclose: " + authentication.getCredentials());
+//        String password = passwordEncoder.encode((String) authentication.getCredentials());
+//        LOG.info("disclose: " + password);
 
         AppUser user = userRepository.findByLogin(username);
 
