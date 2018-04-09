@@ -5,6 +5,7 @@
 <link rel="import" href="libs/polymer-elements/paper-card/paper-card.html">
 <link rel="import" href="libs/polymer-elements/paper-input/paper-input.html">
 <link rel="import" href="libs/polymer-elements/paper-dialog/paper-dialog.html">
+<link rel="import" href="libs/polymer-elements/iron-icons/iron-icons.html">
 
 <link rel="import" href="libs/polymer-elements/paper-styles/paper-styles.html">
 <link rel="import" href="libs/polymer-elements/iron-flex-layout/iron-flex-layout-classes.html">
@@ -14,48 +15,9 @@
 <script src="libs/md5.min.js"></script>
 
 <dom-module id="users-page">
-    <link rel="import" type="css" href="webjars/font-awesome/5.0.6/web-fonts-with-css/css/fa-regular.min.css">
-    <link rel="import" type="css" href="webjars/font-awesome/5.0.6/web-fonts-with-css/css/fontawesome.min.css">
+    <link rel="import" type="css" href="css/styles.css">
     <template>
         <style include="iron-flex iron-flex-alignment">
-            .layout {
-                display: flex;
-            }
-            .container {
-                padding-top: 2rem;
-            }
-            .container paper-card {
-                width: 75%;
-            }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-            }
-            td, th {
-                text-align: center;
-                padding: 0.8rem;
-            }
-            thead > tr, tr:not(:last-of-type) {
-                border-bottom: 1px solid var(--dark-theme-table-border-color);
-            }
-            thead > tr > th:first-of-type {
-                border-top-left-radius: 5px;
-            }
-            thead > tr > th:last-of-type {
-                border-top-right-radius: 5px;
-            }
-            tbody > tr:last-of-type > td:first-of-type {
-                border-bottom-left-radius: 5px;
-            }
-            tbody > tr:last-of-type > td:last-of-type {
-                border-bottom-right-radius: 5px;
-            }
-            tr:hover {
-                background-color: var(--dark-theme-hover-color);
-            }
-            td:not(:last-child), th:not(:last-child) {
-                border-right: 1px solid var(--dark-theme-table-border-color);
-            }
             th:last-of-type,td:last-of-type,th:first-of-type,td:first-of-type {
                 width: 10%;
             }
@@ -95,8 +57,8 @@
                                     <td>[[item.login]]</td>
                                     <td>[[item.roles]]</td>
                                     <td>
-                                        <paper-button class="remove-icon" on-click="removeUser">
-                                            <i class="far fa-trash-alt"></i>
+                                        <paper-button class="table-btn remove-icon" on-click="removeUser">
+                                            <iron-icon icon="icons:delete-forever"></iron-icon>
                                         </paper-button>
                                     </td>
                                 </tr>

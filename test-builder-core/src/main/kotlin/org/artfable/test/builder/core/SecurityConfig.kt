@@ -58,7 +58,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
         val defaultEntryPoint = DelegatingAuthenticationEntryPoint(
                 entryPoints)
 
-        defaultEntryPoint.setDefaultEntryPoint(BasicAuthenticationEntryPoint())
+        defaultEntryPoint.setDefaultEntryPoint(HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
 
         http.csrf()
                 .disable()

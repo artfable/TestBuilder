@@ -10,7 +10,7 @@ dependencies {
 //    compile 'org.webjars:polymer-elements-all:0.1.0'
 
 //    compile 'org.webjars.npm:fontawesome:4.7.2'
-    compile 'org.webjars:font-awesome:5.0.6'
+//    compile 'org.webjars:font-awesome:5.0.6'
 
     compile 'org.jetbrains.kotlin:kotlin-stdlib'
     compile 'org.springframework.boot:spring-boot-starter-web'
@@ -26,6 +26,9 @@ sourceSets {
 
 jar {
     includeEmptyDirs = false
+    manifest {
+        attributes 'Main-Class': 'org.artfable.test.builder.web.ApplicationInitializerKt'
+    }
 }
 
 sass {

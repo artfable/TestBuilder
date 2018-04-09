@@ -1,0 +1,33 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+td, th {
+    text-align: center;
+    padding: 0.8rem;
+    .table-btn {
+        padding: 0;
+        min-width: 0;
+    }
+}
+thead > tr, tr:not(:last-of-type) {
+    border-bottom: 1px solid var(--dark-theme-table-border-color);
+}
+thead > tr > th:first-of-type {
+    border-top-left-radius: 5px;
+}
+thead > tr > th:last-of-type {
+    border-top-right-radius: 5px;
+}
+tbody > tr:last-of-type > td:first-of-type {
+    border-bottom-left-radius: 5px;
+}
+tbody > tr:last-of-type > td:last-of-type {
+    border-bottom-right-radius: 5px;
+}
+tr:hover {
+    background-color: var(--dark-theme-hover-color);
+}
+td:not(:last-child), th:not(:last-child) {
+    border-right: 1px solid var(--dark-theme-table-border-color);
+}

@@ -1,6 +1,6 @@
 allprojects {
-    group 'org.artfable'
-    version '1.0-RELEASE'
+    group = 'org.artfable'
+    version = '1.0-RELEASE'
 }
 
 subprojects {

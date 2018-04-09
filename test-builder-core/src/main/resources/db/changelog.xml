@@ -1,3 +1,4 @@
+<!-- TODO: Should be in web package and should include from dependencies-->
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -6,5 +7,6 @@
     http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
     <include file="security-changelog.xml" relativeToChangelogFile="true"/>
+    <include file="app-model-changelog.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

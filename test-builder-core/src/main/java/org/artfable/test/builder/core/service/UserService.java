@@ -6,6 +6,7 @@ import org.artfable.test.builder.core.model.UserDetailsDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.session.SessionAuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +29,7 @@ public class UserService {
 
     public AppUser getCurrentUser() {
         UserDetailsDto user = (UserDetailsDto) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userRepository.findById(user.getId()).get();
+        return userRepository.findById(user.getId()).orElseThrow(() -> new SessionAuthenticationException("User wasn't authorised"));
     }
 
     public List<AppUser> getAllUsers() {

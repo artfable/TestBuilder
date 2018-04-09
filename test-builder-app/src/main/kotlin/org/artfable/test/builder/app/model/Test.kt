@@ -11,10 +11,11 @@ import javax.persistence.*
 @Table(name = "TESTS")
 data class Test(
         @Id @GeneratedValue(strategy= GenerationType.AUTO) val id: Long? = null,
+        val name: String = "",
         val description: String = "",
-        val comment: String = "",
-        @JsonIgnore
-        @OneToMany(fetch = FetchType.LAZY)
-        @JoinTable(name = "QUESTION_GROUPS", joinColumns = [JoinColumn(name = "TEST_ID")])
-        val questionGroups: List<QuestionGroup> = ArrayList()
+        val comment: String = ""
+//        @JsonIgnore
+//        @OneToMany(fetch = FetchType.LAZY)
+//        @JoinTable(name = "QUESTION_GROUPS", joinColumns = [JoinColumn(name = "TEST_ID")])
+//        val questionGroups: List<QuestionGroup> = ArrayList()
 )
