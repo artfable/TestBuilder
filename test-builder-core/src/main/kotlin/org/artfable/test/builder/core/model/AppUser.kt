@@ -11,7 +11,7 @@ import javax.persistence.*
 @Entity
 @Table(name = "USERS")
 data class AppUser(
-        @Id @GeneratedValue(strategy=GenerationType.AUTO) val id: Long? = null,
+        @Id @GeneratedValue(strategy=GenerationType.IDENTITY) val id: Long? = null,
         @Column val login: String = "",
         @get:JsonIgnore @set:JsonProperty(value = "password") @Column var password: String = "",
         @Column val name: String? = null,

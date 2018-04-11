@@ -24,9 +24,6 @@
             .card-action {
                 padding: 0.2rem;
             }
-            .primary-btn {
-                background-color: var(--dark-theme-primary-button-color);
-            }
             .small-dialog {
                 width: 40rem;
             }
@@ -137,6 +134,16 @@
                 };
             }
 
+            createUser() {
+                this.set('newUser', {});
+                this.$.createUser.open();
+            }
+
+            removeUser(event) {
+                this.set('toDelete', event.model.get('item.id'));
+                this.$.removeUser.open();
+            }
+
             _routeChanged(routeData) {
                 if (routeData.page == 'users') {
                     this.$.getUsers.generateRequest();
@@ -194,16 +201,6 @@
 
             _deleteUser() {
                 this.$.deleteUser.generateRequest();
-            }
-
-            createUser() {
-                this.set('newUser', {});
-                this.$.createUser.open();
-            }
-
-            removeUser(event) {
-                this.set('toDelete', event.model.get('item.id'));
-                this.$.removeUser.open();
             }
         }
 

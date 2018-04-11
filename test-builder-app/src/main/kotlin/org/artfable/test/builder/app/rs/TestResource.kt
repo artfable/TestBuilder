@@ -1,9 +1,11 @@
 package org.artfable.test.builder.app.rs
 
+import org.artfable.test.builder.app.model.Test
 import org.artfable.test.builder.app.service.TestService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
@@ -23,5 +25,11 @@ class TestResource {
     @PreAuthorize("hasAuthority('ADMIN')")
     fun getAllTests(): ResponseEntity<Any> {
         return ResponseEntity.ok(testService.allTests)
+    }
+
+    @RequestMapping(method = [RequestMethod.POST])
+    @PreAuthorize("hasAuthority('ADMIN')")
+    fun createTest(@RequestBody test: Test): ResponseEntity<Any> {
+        return ResponseEntity.ok(testService.createTest(test))
     }
 }

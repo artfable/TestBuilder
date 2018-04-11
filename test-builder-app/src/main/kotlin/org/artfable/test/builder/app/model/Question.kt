@@ -16,7 +16,7 @@ data class Question(
         val type: Type = Type.SINGLE,
         @JsonIgnore
         @OneToMany(fetch = FetchType.LAZY)
-        @JoinTable(name = "ANSWERS", joinColumns = [JoinColumn(name = "QUESTION_ID")])
+        @JoinColumn(name = "QUESTION_ID", referencedColumnName = "ID")
         val answers: Set<Answer> = HashSet()
 ) {
 

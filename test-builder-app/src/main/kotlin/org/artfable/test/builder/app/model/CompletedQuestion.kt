@@ -1,7 +1,6 @@
 package org.artfable.test.builder.app.model
 
-import javax.persistence.Embeddable
-import javax.persistence.Table
+import javax.persistence.*
 
 /**
  * @author artfable
@@ -10,6 +9,6 @@ import javax.persistence.Table
 @Embeddable
 @Table(name = "COMPLETED_QUESTIONS")
 class CompletedQuestion(
-    val questionId: Long = 0,
-    val answerIds: Set<Long> = HashSet()
+        @Column(name = "QUESTION_ID") val questionId: Long = 0
+//        val answerIds: Set<Long> = HashSet()
 )

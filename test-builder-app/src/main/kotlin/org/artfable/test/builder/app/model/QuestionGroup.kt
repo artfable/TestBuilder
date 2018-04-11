@@ -18,7 +18,7 @@ data class QuestionGroup(
         @Column(name = "QUESTION_AMOUNT") val questionAmount: Int = 0,
         val points: Int = 0,
         @OneToMany(fetch = FetchType.EAGER)
-        @JoinTable(name = "QUESTIONS", joinColumns = [JoinColumn(name = "GROUP_ID")])
+        @JoinColumn(name = "GROUP_ID", referencedColumnName = "ID")
         val questions: Set<Question> = HashSet()
 ) {
     @Transient

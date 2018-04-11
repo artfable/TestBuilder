@@ -3,6 +3,7 @@ package org.artfable.test.builder.app.service;
 import org.artfable.test.builder.app.data.TestRepository;
 import org.artfable.test.builder.app.model.QuestionGroup;
 import org.artfable.test.builder.app.model.Test;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,14 @@ public class TestService {
 
     public List<Test> getAllTests() {
         return testRepository.findAll();
+    }
+
+    public Test createTest(Test test) {
+        if (test.getId() != null) {
+            throw new IllegalArgumentException("There should be no id for a new Test");
+        }
+
+        return testRepository.saveAndFlush(test);
     }
 
 //    @Transactional

@@ -3,6 +3,7 @@ apply plugin: 'org.springframework.boot'
 
 dependencies {
     compile project(":test-builder-core")
+    compile project(":test-builder-app")
 
     compile 'org.webjars.bower:github-com-webcomponents-shadycss:v1.0.0'
     compile 'org.webjars.bower:github-com-webcomponents-webcomponentsjs:v1.0.2' // some problem with webjars

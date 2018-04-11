@@ -4,6 +4,7 @@
 <link rel="import" href="libs/polymer-elements/paper-button/paper-button.html">
 <link rel="import" href="libs/polymer-elements/paper-card/paper-card.html">
 <link rel="import" href="libs/polymer-elements/paper-input/paper-input.html">
+<link rel="import" href="libs/polymer-elements/paper-input/paper-textarea.html">
 <link rel="import" href="libs/polymer-elements/paper-dialog/paper-dialog.html">
 
 <link rel="import" href="libs/polymer-elements/paper-styles/paper-styles.html">
@@ -22,9 +23,6 @@
             }
             .card-action {
                 padding: 0.2rem;
-            }
-            .primary-btn {
-                background-color: var(--dark-theme-primary-button-color);
             }
             .small-dialog {
                 width: 40rem;
@@ -59,11 +57,23 @@
                 </div>
                 <div class="card-action">
                     <div class="layout horizontal end-justified">
-
+                        <paper-button class="primary-btn" on-click="createTest">Create new Test</paper-button>
                     </div>
                 </div>
             </paper-card>
         </div>
+
+        <paper-dialog id="createTestDialog" no-cancel-on-outside-click with-backdrop class="small-dialog">
+            <div>
+                <paper-input label="Name" auto-validate="true" value="{{newTest.name}}" autofocus
+                             pattern=".+" error-message="Name should be specified"></paper-input>
+                <paper-textarea label="Description" value="{{newTest.description}}"></paper-textarea>
+            </div>
+            <div class="buttons">
+                <paper-button dialog-confirm disabled="[[passwordInvalid]]" on-click="_onSaveNewTest">Save</paper-button>
+                <paper-button dialog-dismiss>Close</paper-button>
+            </div>
+        </paper-dialog>
 
         <paper-dialog id="error" modal>
             <p>Server-side error. Please try later or call to the business support.</p>
@@ -73,6 +83,7 @@
         </paper-dialog>
 
         <iron-ajax id="getTests" url="/api/tests/" handle-as="json" on-response="_handleTests" on-error="_handleError"></iron-ajax>
+        <iron-ajax id="createTest" url="/api/tests/" method="POST" content-type="application/json" handle-as="json" on-response="_handleNewTest" on-error="_handleError"></iron-ajax>
     </template>
 
     <script>
@@ -88,14 +99,29 @@
                         reflectToAttribute: true
                     },
                     tests: Object,
+                    newTest: Object,
                     rootPath: String
                 };
+            }
+
+            createTest() {
+                this.set('newTest', {});
+                this.$.createTestDialog.open();
             }
 
             _routeChanged(routeData) {
                 if (routeData.page == 'all-tests') {
                     this.$.getTests.generateRequest();
                 }
+            }
+
+            _onSaveNewTest() {
+                this.$.createTest.body = this.get('newTest');
+                this.$.createTest.generateRequest();
+            }
+
+            _handleNewTest(event, response) {
+                this.push('tests', response.parseResponse());
             }
 
             _handleTests(event, response) {

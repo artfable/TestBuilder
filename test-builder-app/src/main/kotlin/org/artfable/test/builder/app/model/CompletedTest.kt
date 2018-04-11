@@ -10,12 +10,12 @@ import javax.persistence.*
 @Entity
 @Table(name = "COMPLETED_TESTS")
 class CompletedTest(
-        val id: Long? = null,
+        @Id @GeneratedValue(strategy= GenerationType.AUTO) val id: Long? = null,
         val userId: Long = 0,
         val testId: Long = 0,
         val startTime: LocalDateTime = LocalDateTime.now(),
         val points: Int = 0,
-        @OneToMany(fetch = FetchType.EAGER)
-        @JoinTable(name = "COMPLETED_QUESTIONS", joinColumns = [JoinColumn(name = "TEST_ID")])
+        @ElementCollection(fetch = FetchType.EAGER)
+        @CollectionTable(name = "COMPLETED_QUESTIONS", joinColumns = [JoinColumn(name = "TEST_ID")])
         val questions: List<CompletedQuestion> = ArrayList()
 )
