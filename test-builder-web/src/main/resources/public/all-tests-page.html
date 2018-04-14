@@ -7,6 +7,8 @@
 <link rel="import" href="libs/polymer-elements/paper-input/paper-textarea.html">
 <link rel="import" href="libs/polymer-elements/paper-dialog/paper-dialog.html">
 
+<link rel="import" href="libs/polymer-elements/iron-icons/iron-icons.html">
+
 <link rel="import" href="libs/polymer-elements/paper-styles/paper-styles.html">
 <link rel="import" href="libs/polymer-elements/iron-flex-layout/iron-flex-layout-classes.html">
 
@@ -27,10 +29,6 @@
             .small-dialog {
                 width: 40rem;
             }
-
-            .remove-icon {
-                color: var(--dark-theme-remove-icon-color);
-            }
         </style>
 
         <menu-element roles="[[roles]]" page="all-tests"></menu-element>
@@ -43,6 +41,8 @@
                         <tr>
                             <th>#</th>
                             <th>Name</th>
+                            <th>Comment</th>
+                            <th></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -50,6 +50,12 @@
                             <tr>
                                 <td>[[item.id]]</td>
                                 <td>[[item.name]]</td>
+                                <td>[[item.comment]]</td>
+                                <td>
+                                    <paper-button class="table-btn remove-btn" on-click="removeTest">
+                                        <iron-icon icon="icons:delete-forever"></iron-icon>
+                                    </paper-button>
+                                </td>
                             </tr>
                         </template>
                         </tbody>
@@ -70,8 +76,16 @@
                 <paper-textarea label="Description" value="{{newTest.description}}"></paper-textarea>
             </div>
             <div class="buttons">
-                <paper-button dialog-confirm disabled="[[passwordInvalid]]" on-click="_onSaveNewTest">Save</paper-button>
+                <paper-button dialog-confirm on-click="_onSaveNewTest">Save</paper-button>
                 <paper-button dialog-dismiss>Close</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="removeTestDialog" modal>
+            <p>Whole test's configuration will be gone. Are you sure you want to delete it?</p>
+            <div class="buttons">
+                <paper-button class="remove-btn" dialog-confirm on-click="_onRemoveTest">Delete</paper-button>
+                <paper-button dialog-dismiss autofocus>Cancel</paper-button>
             </div>
         </paper-dialog>
 
@@ -84,6 +98,7 @@
 
         <iron-ajax id="getTests" url="/api/tests/" handle-as="json" on-response="_handleTests" on-error="_handleError"></iron-ajax>
         <iron-ajax id="createTest" url="/api/tests/" method="POST" content-type="application/json" handle-as="json" on-response="_handleNewTest" on-error="_handleError"></iron-ajax>
+        `<iron-ajax id="deleteTest" url="/api/tests/[[toDelete]]" method="DELETE" content-type="application/json" handle-as="json" on-response="_handleTestDeleted" on-error="_handleError"></iron-ajax>
     </template>
 
     <script>
@@ -109,6 +124,11 @@
                 this.$.createTestDialog.open();
             }
 
+            removeTest(event) {
+                this.set('toDelete', event.model.get('item.id'));
+                this.$.removeTestDialog.open();
+            }
+
             _routeChanged(routeData) {
                 if (routeData.page == 'all-tests') {
                     this.$.getTests.generateRequest();
@@ -120,12 +140,20 @@
                 this.$.createTest.generateRequest();
             }
 
+            _onRemoveTest() {
+                this.$.deleteTest.generateRequest();
+            }
+
             _handleNewTest(event, response) {
                 this.push('tests', response.parseResponse());
             }
 
             _handleTests(event, response) {
                 this.set('tests', response.parseResponse());
+            }
+
+            _handleTestDeleted() {
+                this.$.getTests.generateRequest();
             }
 
             _handleError(event, detail) {

@@ -11,9 +11,9 @@ import javax.persistence.*
 @Table(name = "TESTS")
 data class Test(
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null,
-        val name: String = "",
-        val description: String = "",
-        val comment: String = ""
+        var name: String = "",
+        var description: String = "",
+        var comment: String = ""
 //        @JsonIgnore
 //        @OneToMany(fetch = FetchType.LAZY)
 //        @JoinTable(name = "QUESTION_GROUPS", joinColumns = [JoinColumn(name = "TEST_ID")])

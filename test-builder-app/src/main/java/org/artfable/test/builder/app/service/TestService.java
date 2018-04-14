@@ -1,15 +1,11 @@
 package org.artfable.test.builder.app.service;
 
 import org.artfable.test.builder.app.data.TestRepository;
-import org.artfable.test.builder.app.model.QuestionGroup;
 import org.artfable.test.builder.app.model.Test;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author artfable
@@ -31,6 +27,24 @@ public class TestService {
         }
 
         return testRepository.saveAndFlush(test);
+    }
+
+    public void deleteTest(long id) {
+        testRepository.deleteById(id);
+    }
+
+    public Test updateTest(Test test) {
+        if (test.getId() == null) {
+            throw new IllegalArgumentException("Id should be specified to modify the Test");
+        }
+
+        Test oldTest = testRepository.findById(test.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Test with id [" + test.getId() + "] isn't exist"));
+
+        oldTest.setName(test.getName());
+        oldTest.setComment(test.getComment());
+        oldTest.setDescription(test.getDescription());
+        return testRepository.saveAndFlush(oldTest);
     }
 
 //    @Transactional

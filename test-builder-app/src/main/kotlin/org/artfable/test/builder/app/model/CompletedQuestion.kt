@@ -9,6 +9,7 @@ import javax.persistence.*
 @Embeddable
 @Table(name = "COMPLETED_QUESTIONS")
 class CompletedQuestion(
-        @Column(name = "QUESTION_ID") val questionId: Long = 0
+        @Column(name = "QUESTION_ID") val questionId: Long = 0,
+        @Column(name = "QUESTION_SNAPSHOT") val questionSnapshot: String = ""
 //        val answerIds: Set<Long> = HashSet()
 )
