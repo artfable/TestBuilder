@@ -22,6 +22,11 @@ class UserResource {
         return ResponseEntity.ok(userService.currentUser)
     }
 
+    @RequestMapping(path = ["/current/roles"], method = [RequestMethod.GET])
+    fun getCurrentUserRoles(): ResponseEntity<Any> {
+        return ResponseEntity.ok(userService.currentUser.roles)
+    }
+
     @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping(method = [RequestMethod.GET])
     fun getAllUsers(): ResponseEntity<Any> {

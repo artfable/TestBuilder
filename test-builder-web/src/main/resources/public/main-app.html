@@ -16,6 +16,8 @@
 <link rel="import" href="libs/polymer-elements/paper-styles/paper-styles.html">
 <link rel="import" href="libs/polymer-elements/iron-flex-layout/iron-flex-layout-classes.html">
 
+<link rel="import" href="libs/polymer-elements/polymer/lib/utils/render-status.html">
+
 <dom-module id="main-app">
     <template>
         <style include="iron-flex">
@@ -59,7 +61,7 @@
             <all-tests-page roles="[[roles]]" name="all-tests" route-data="[[routeData]]"></all-tests-page>
         </iron-pages>
 
-        <!--<iron-ajax auto url="/api/test"></iron-ajax>-->
+        <iron-ajax id="getRoles" url="/api/users/current/roles" handle-as="json" on-response="_handleRoles"></iron-ajax>
 
 
     </template>
@@ -70,7 +72,6 @@
 
             static get properties() {
                 return {
-                    // FIXME: after refresh
                     roles: Array,
                     page: {
                         type: String,
@@ -89,6 +90,15 @@
                 return [
                     '_routePageChanged(routeData.page)',
                 ];
+            }
+
+            ready() {
+                super.ready();
+                Polymer.RenderStatus.afterNextRender(this, () => {
+                    if (!this.get('roles')) {
+                        this.$.getRoles.generateRequest();
+                    }
+                });
             }
 
             _routePageChanged(page) {
@@ -118,6 +128,10 @@
 
             _showPage404() {
                 // this.page = 'view404';
+            }
+
+            _handleRoles(event, response) {
+                this.set('roles', response.parseResponse());
             }
         }
 
