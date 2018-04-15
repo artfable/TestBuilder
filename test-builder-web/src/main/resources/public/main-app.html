@@ -58,7 +58,7 @@
             <profile-page roles="[[roles]]" name="profile" route-data="[[routeData]]"></profile-page>
             <login-page roles="{{roles}}" class="layout center-center" name="login"></login-page>
             <users-page roles="[[roles]]" name="users" route-data="[[routeData]]"></users-page>
-            <all-tests-page roles="[[roles]]" name="all-tests" route-data="[[routeData]]"></all-tests-page>
+            <tests-page roles="[[roles]]" name="tests" route-data="[[routeData]]" route="[[subroute]]"></tests-page>
         </iron-pages>
 
         <iron-ajax id="getRoles" url="/api/users/current/roles" handle-as="json" on-response="_handleRoles"></iron-ajax>
@@ -79,7 +79,7 @@
                         observer: '_pageChanged',
                     },
                     routeData: Object,
-                    subroute: String,
+                    subroute: Object,
                     // This shouldn't be neccessary, but the Analyzer isn't picking up
                     // Polymer.Element#rootPath
                     rootPath: String,
@@ -102,13 +102,15 @@
             }
 
             _routePageChanged(page) {
-                console.log('[main-app] Page: ' + page);
+                console.log(`[main-app] Page: ${page}, subroute: ${this.get('subroute').path}`);
 
                 // If no page was found in the route data, page will be an empty string.
                 // Default to 'view1' in that case.
                 this.page = page || 'profile';
 
-                window.location.hash = '/' + this.page;
+                if (!page) {
+                    window.location.hash = '/' + this.page;
+                }
 
                 // Close a non-persistent drawer when the page & route are changed.
                 // if (!this.$.drawer.persistent) {

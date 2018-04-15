@@ -1,0 +1,64 @@
+<link rel="import" href="libs/polymer-elements/polymer/polymer-element.html">
+<!--<link rel="import" href="libs/polymer-elements/iron-ajax/iron-ajax.html">-->
+<!--<link rel="import" href="libs/polymer-elements/app-layout/app-layout.html">-->
+<!--<link rel="import" href="libs/polymer-elements/paper-button/paper-button.html">-->
+<!--<link rel="import" href="libs/polymer-elements/paper-card/paper-card.html">-->
+<!--<link rel="import" href="libs/polymer-elements/paper-input/paper-input.html">-->
+<!--<link rel="import" href="libs/polymer-elements/paper-input/paper-textarea.html">-->
+<!--<link rel="import" href="libs/polymer-elements/paper-dialog/paper-dialog.html">-->
+
+<!--<link rel="import" href="libs/polymer-elements/app-route/app-location.html">-->
+<link rel="import" href="libs/polymer-elements/app-route/app-route.html">
+<link rel="import" href="libs/polymer-elements/iron-pages/iron-pages.html">
+
+<!--<link rel="import" href="libs/polymer-elements/iron-icons/iron-icons.html">-->
+
+<link rel="import" href="libs/polymer-elements/paper-styles/paper-styles.html">
+<link rel="import" href="libs/polymer-elements/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="menu-element.html">
+
+<link rel="import" href="all-tests-page.html">
+
+<dom-module id="test-config-page">
+    <link rel="import" type="css" href="css/styles.css">
+    <template>
+        <style include="iron-flex iron-flex-alignment">
+
+        </style>
+
+
+    </template>
+
+    <script>
+        class TestConfigPage extends Polymer.Element {
+            static get is() { return 'test-config-page'; }
+
+            static get properties() {
+                return {
+                    roles: Array,
+                    routeData: {
+                        type: Object,
+                        reflectToAttribute: true
+                    },
+                    testId: {
+                        type: Number,
+                        observer: '_testIdChanged',
+                        reflectToAttribute: true
+                    }
+                };
+            }
+
+
+            _testIdChanged(testId) {
+                if (testId) {
+                    // TODO: request for test data
+                    console.debug(this.get('testId'));
+                }
+            }
+
+        }
+
+        window.customElements.define(TestConfigPage.is, TestConfigPage);
+    </script>
+</dom-module>

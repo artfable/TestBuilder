@@ -14,8 +14,6 @@
 
 <link rel="import" href="menu-element.html">
 
-<script src="libs/md5.min.js"></script>
-
 <dom-module id="all-tests-page">
     <link rel="import" type="css" href="css/styles.css">
     <template>
@@ -29,9 +27,10 @@
             .small-dialog {
                 width: 40rem;
             }
+            .clickable {
+                cursor: pointer;
+            }
         </style>
-
-        <menu-element roles="[[roles]]" page="all-tests"></menu-element>
 
         <div class="layout center-center container">
             <paper-card>
@@ -48,8 +47,8 @@
                         <tbody>
                         <template is="dom-repeat" items="{{tests}}">
                             <tr>
-                                <td>[[item.id]]</td>
-                                <td>[[item.name]]</td>
+                                <td on-click="navigateToTestConfig" class="clickable">[[item.id]]</td>
+                                <td on-click="navigateToTestConfig" class="clickable">[[item.name]]</td>
                                 <td>[[item.comment]]</td>
                                 <td>
                                     <paper-button class="table-btn remove-btn" on-click="removeTest">
@@ -98,11 +97,11 @@
 
         <iron-ajax id="getTests" url="/api/tests/" handle-as="json" on-response="_handleTests" on-error="_handleError"></iron-ajax>
         <iron-ajax id="createTest" url="/api/tests/" method="POST" content-type="application/json" handle-as="json" on-response="_handleNewTest" on-error="_handleError"></iron-ajax>
-        `<iron-ajax id="deleteTest" url="/api/tests/[[toDelete]]" method="DELETE" content-type="application/json" handle-as="json" on-response="_handleTestDeleted" on-error="_handleError"></iron-ajax>
+        <iron-ajax id="deleteTest" url="/api/tests/[[toDelete]]" method="DELETE" content-type="application/json" handle-as="json" on-response="_handleTestDeleted" on-error="_handleError"></iron-ajax>
     </template>
 
     <script>
-        class TestsPage extends Polymer.Element {
+        class AllTestsPage extends Polymer.Element {
             static get is() { return 'all-tests-page'; }
 
             static get properties() {
@@ -125,12 +124,17 @@
             }
 
             removeTest(event) {
+                event.stopPropagation();
                 this.set('toDelete', event.model.get('item.id'));
                 this.$.removeTestDialog.open();
             }
 
+            navigateToTestConfig(event) {
+                location.hash = '/tests/' + event.model.get('item.id');
+            }
+
             _routeChanged(routeData) {
-                if (routeData.page == 'all-tests') {
+                if (routeData.page == 'tests') {
                     this.$.getTests.generateRequest();
                 }
             }
@@ -149,7 +153,7 @@
             }
 
             _handleTests(event, response) {
-                this.set('tests', response.parseResponse());
+                this.set('tests', response.parseResponse() || []);
             }
 
             _handleTestDeleted() {
@@ -168,6 +172,6 @@
             }
         }
 
-        window.customElements.define(TestsPage.is, TestsPage);
+        window.customElements.define(AllTestsPage.is, AllTestsPage);
     </script>
 </dom-module>

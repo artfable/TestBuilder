@@ -1,0 +1,74 @@
+<link rel="import" href="libs/polymer-elements/polymer/polymer-element.html">
+
+<link rel="import" href="libs/polymer-elements/app-route/app-route.html">
+<link rel="import" href="libs/polymer-elements/iron-pages/iron-pages.html">
+
+<link rel="import" href="libs/polymer-elements/paper-styles/paper-styles.html">
+
+<link rel="import" href="menu-element.html">
+
+<link rel="import" href="all-tests-page.html">
+<link rel="import" href="test-config-page.html">
+
+<dom-module id="tests-page">
+    <link rel="import" type="css" href="css/styles.css">
+    <template>
+        <style>
+
+        </style>
+
+        <app-route
+                route="{{route}}"
+                pattern="/:testId"
+                data="{{routeData.subroute}}"
+                tail="{{subroute}}">
+        </app-route>
+
+        <menu-element roles="[[roles]]" page="tests"></menu-element>
+
+        <iron-pages
+                selected="[[subpage]]"
+                attr-for-selected="name"
+                role="main">
+            <test-config-page name="single" route-data="[[routeData]]" test-id="[[routeData.subroute.testId]]"></test-config-page>
+            <all-tests-page name="all" route-data="[[routeData]]"></all-tests-page>
+        </iron-pages>
+    </template>
+
+    <script>
+        class TestsPage extends Polymer.Element {
+            static get is() { return 'tests-page'; }
+
+            static get properties() {
+                return {
+                    roles: Array,
+                    routeData: {
+                        type: Object,
+                        observer: '_routeChanged',
+                        reflectToAttribute: true
+                    },
+                    route: {
+                        type: String,
+                        reflectToAttribute: true
+                    },
+                    rootPath: String,
+                    subpage: String
+                };
+            }
+
+
+            _routeChanged(routeData) {
+                if (routeData.page == 'tests' && (!routeData.subroute || !routeData.subroute.testId)) {
+                    this.set('subpage', 'all');
+                } else {
+                    this.set('subpage', 'single');
+                }
+
+                console.log('[TestsPage] Subpage: ' + this.get('subpage'));
+            }
+
+        }
+
+        window.customElements.define(TestsPage.is, TestsPage);
+    </script>
+</dom-module>
