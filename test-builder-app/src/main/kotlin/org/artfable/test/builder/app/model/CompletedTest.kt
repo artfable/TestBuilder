@@ -10,7 +10,7 @@ import javax.persistence.*
 @Entity
 @Table(name = "COMPLETED_TESTS")
 class CompletedTest(
-        @Id @GeneratedValue(strategy= GenerationType.AUTO) val id: Long? = null,
+        @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null,
         val userId: Long = 0,
         val testId: Long = 0,
         val startTime: LocalDateTime = LocalDateTime.now(),

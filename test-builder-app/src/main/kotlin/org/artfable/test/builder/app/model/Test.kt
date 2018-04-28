@@ -13,9 +13,9 @@ data class Test(
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null,
         var name: String = "",
         var description: String = "",
-        var comment: String = ""
-//        @JsonIgnore
-//        @OneToMany(fetch = FetchType.LAZY)
-//        @JoinTable(name = "QUESTION_GROUPS", joinColumns = [JoinColumn(name = "TEST_ID")])
-//        val questionGroups: List<QuestionGroup> = ArrayList()
+        var comment: String = "",
+        @JsonIgnore
+        @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+        @JoinColumn(name = "TEST_ID", referencedColumnName = "ID")
+        val questionGroups: List<QuestionGroup> = ArrayList()
 )

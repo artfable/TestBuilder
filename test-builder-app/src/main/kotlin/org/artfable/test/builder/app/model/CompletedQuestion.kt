@@ -1,6 +1,8 @@
 package org.artfable.test.builder.app.model
 
-import javax.persistence.*
+import javax.persistence.Column
+import javax.persistence.Embeddable
+import javax.persistence.Table
 
 /**
  * @author artfable

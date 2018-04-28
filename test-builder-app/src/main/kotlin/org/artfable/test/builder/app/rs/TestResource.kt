@@ -24,6 +24,12 @@ class TestResource {
         return ResponseEntity.ok(testService.allTests)
     }
 
+    @RequestMapping(method = [RequestMethod.GET], path = ["/{id}"])
+    @PreAuthorize("hasAuthority('ADMIN')")
+    fun getTest(@PathVariable("id") id: Long): ResponseEntity<Any> {
+        return ResponseEntity.ok(testService.getTest(id))
+    }
+
     @RequestMapping(method = [RequestMethod.POST])
     @PreAuthorize("hasAuthority('ADMIN')")
     fun createTest(@RequestBody test: Test): ResponseEntity<Any> {

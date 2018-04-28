@@ -10,15 +10,20 @@ import javax.persistence.*
 @Entity
 @Table(name = "QUESTIONS")
 data class Question(
-        @Id @GeneratedValue(strategy = GenerationType.AUTO) val id: Long? = null,
+        @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null,
         val text: String = "",
         val comment: String = "",
         val type: Type = Type.SINGLE,
         @JsonIgnore
-        @OneToMany(fetch = FetchType.LAZY)
+        @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
         @JoinColumn(name = "QUESTION_ID", referencedColumnName = "ID")
         val answers: Set<Answer> = HashSet()
 ) {
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @JoinColumn(name = "GROUP_ID")
+    var questionGroup: QuestionGroup? = null
 
     enum class Type {
         MULTIPLE, SINGLE

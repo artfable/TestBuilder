@@ -1,5 +1,7 @@
 package org.artfable.test.builder.app.service;
 
+import org.artfable.test.builder.app.data.QuestionGroupRepository;
+import org.artfable.test.builder.app.data.QuestionRepository;
 import org.artfable.test.builder.app.data.TestRepository;
 import org.artfable.test.builder.app.model.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,12 @@ public class TestService {
 
     @Autowired
     private TestRepository testRepository;
+
+    @Autowired
+    private QuestionGroupRepository questionGroupRepository;
+
+    @Autowired
+    private QuestionRepository questionRepository;
 
     public List<Test> getAllTests() {
         return testRepository.findAll();
@@ -46,10 +54,4 @@ public class TestService {
         oldTest.setDescription(test.getDescription());
         return testRepository.saveAndFlush(oldTest);
     }
-
-//    @Transactional
-//    public List<QuestionGroup> getQuestionGroups(Long testId) {
-//        Optional<Test> optionalTest = testRepository.findById(testId);
-//        return optionalTest.orElseThrow(() -> new IllegalArgumentException("No test with id [" + testId + "]")).getQuestionGroups();
-//    }
 }

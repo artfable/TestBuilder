@@ -14,4 +14,51 @@
             <column name="comment" type="varchar2(1024)"/>
         </createTable>
     </changeSet>
+
+    <changeSet id="app-model-2" author="artfable">
+        <createTable tableName="QUESTION_GROUPS">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" unique="true"/>
+            </column>
+            <column name="TEST_ID" type="BIGINT">
+                <constraints foreignKeyName="FK_TESTS_ID"
+                             referencedTableName="TESTS"
+                             referencedColumnNames="ID"
+                             nullable="false"/>
+            </column>
+            <column name="NAME" type="varchar2(256)"/>
+            <column name="description" type="varchar2(512)"/>
+            <column name="QUESTION_AMOUNT" type="INTEGER"/>
+            <column name="points" type="INTEGER"/>
+        </createTable>
+
+        <createTable tableName="QUESTIONS">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" unique="true"/>
+            </column>
+            <column name="GROUP_ID" type="BIGINT">
+                <constraints foreignKeyName="FK_QUESTION_GROUPS_ID"
+                             referencedTableName="QUESTION_GROUPS"
+                             referencedColumnNames="ID"
+                             nullable="false"/>
+            </column>
+            <column name="TEXT" type="varchar2(256)"/>
+            <column name="COMMENT" type="varchar2(256)"/>
+            <column name="TYPE" type="varchar2(16)"/>
+        </createTable>
+
+        <createTable tableName="ANSWERS">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" unique="true"/>
+            </column>
+            <column name="QUESTION_ID" type="BIGINT">
+                <constraints foreignKeyName="FK_QUESTIONS_ID"
+                             referencedTableName="QUESTIONS"
+                             referencedColumnNames="ID"
+                             nullable="false"/>
+            </column>
+            <column name="TEXT" type="varchar2(256)"/>
+            <column name="CORRECT" type="NUMBER(1)"/>
+        </createTable>
+    </changeSet>
 </databaseChangeLog>

@@ -9,7 +9,7 @@ import javax.persistence.*
 @Entity
 @Table(name = "ANSWERS")
 data class Answer(
-        @Id @GeneratedValue(strategy = GenerationType.AUTO) val id: Long? = null,
+        @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null,
         val text: String = "",
         val correct: Boolean = false
 )

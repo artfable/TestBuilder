@@ -1,0 +1,133 @@
+<link rel="import" href="../libs/polymer-elements/polymer/polymer-element.html">
+
+<link rel="import" href="../libs/polymer-elements/iron-icons/iron-icons.html">
+<link rel="import" href="../libs/polymer-elements/polymer/lib/utils/flattened-nodes-observer.html">
+
+<link rel="import" href="../libs/polymer-elements/paper-styles/paper-styles.html">
+<link rel="import" href="../libs/polymer-elements/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="../custom-styles.html">
+
+<dom-module id="paper-tree-item">
+    <template>
+        <style include="custom-styles iron-flex iron-flex-alignment">
+            .tree-item-children {
+                padding-left: 2rem;
+            }
+            #treeItemHeader {
+                cursor: pointer;
+                border-radius: 0.5rem;
+                padding: 0.2rem;
+            }
+            #treeItemHeader.selected {
+                background-color: var(--dark-theme-selected-item);
+            }
+        </style>
+
+        <div id="treeItemHeader" class="layout horizontal" on-click="select">
+            <template is="dom-if" if="{{!leaf}}">
+                <iron-icon class="expand-icon" icon="[[icon]]" on-click="expand"></iron-icon>
+            </template>
+            <div>[[value]]</div>
+        </div>
+        <template is="dom-if" if="{{expanded}}">
+            <div class="tree-item-children">
+                <slot id="content"></slot>
+            </div>
+        </template>
+    </template>
+
+    <script>
+        class PaperTreeItem extends Polymer.Element {
+            static get is() { return 'paper-tree-item'; }
+
+            static get properties() {
+                return {
+                    valueId: {
+                        type: String,
+                        reflectToAttribute: true
+                    },
+                    value: {
+                        type: String,
+                        reflectToAttribute: true
+                    },
+                    leaf: {
+                        type: Boolean
+                    },
+                    expanded: {
+                        type: Boolean,
+                        value: false,
+                        reflectToAttribute: true
+                    },
+                    selected: Boolean,
+                    icon: {
+                        type: String,
+                        computed: '_getIcon(expanded)'
+                    }
+                };
+            }
+
+            ready() {
+                super.ready();
+                this.addEventListener('select', event => {
+                    if (!(this.parentElement instanceof PaperTreeItem)) {
+                        this.unselect(event.target);
+                    }
+                });
+            }
+
+            connectedCallback() {
+                super.connectedCallback();
+                this._observer = new Polymer.FlattenedNodesObserver(this, info => {
+                    // some crap with text (for ENTER) that we don't need
+                    this.leaf = ![].filter.call(this.children, element => element instanceof PaperTreeItem || element.classList.contains('tree-item-content')).length
+                });
+            }
+
+            disconnectedCallback() {
+                super.disconnectedCallback();
+                this._observer.disconnect();
+            }
+
+            expand(event) {
+                event.stopPropagation();
+                this.set('expanded', !this.get('expanded'));
+            }
+
+            select(event) {
+                this.set('selected', true);
+                if (!this.$.treeItemHeader.classList.contains('selected')) {
+                    this.$.treeItemHeader.classList.add('selected');
+                }
+                this.dispatchEvent(new CustomEvent('select', {
+                    bubbles: true,
+                    detail: {
+                        id: this.get('valueId'),
+                        value: this.get('value')
+                    }
+                }));
+            }
+
+            unselect(ignore) {
+                if (ignore != this) {
+                    this.set('selected', false);
+                    this.$.treeItemHeader.classList.remove('selected');
+                }
+                [].filter.call(this.children, element => element instanceof PaperTreeItem)
+                    .forEach(item => item.unselect(ignore));
+            }
+
+            isLeaf() {
+                return ![].filter.call(this.children, element => element instanceof PaperTreeItem).length;
+            }
+
+            _getIcon(expanded) {
+                return expanded ? 'icons:expand-more' : 'icons:chevron-right';
+            }
+
+
+        }
+
+        window.customElements.define(PaperTreeItem.is, PaperTreeItem);
+    </script>
+</dom-module>
