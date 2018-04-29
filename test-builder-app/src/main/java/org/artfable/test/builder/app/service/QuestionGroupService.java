@@ -30,11 +30,6 @@ public class QuestionGroupService {
                 .getQuestionGroups();
     }
 
-    public Test getTest(Long id) {
-        return testRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Test with id [" + id + "] isn't exist"));
-    }
-
     @Transactional
     public QuestionGroup createQuestionGroup(long testId, QuestionGroup questionGroup) {
         if (questionGroup.getId() != null) {

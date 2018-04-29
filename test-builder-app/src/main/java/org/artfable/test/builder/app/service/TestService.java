@@ -29,6 +29,11 @@ public class TestService {
         return testRepository.findAll();
     }
 
+    public Test getTest(Long id) {
+        return testRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Test with id [" + id + "] isn't exist"));
+    }
+
     public Test createTest(Test test) {
         if (test.getId() != null) {
             throw new IllegalArgumentException("There should be no id for a new Test");
