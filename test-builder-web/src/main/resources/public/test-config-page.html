@@ -18,6 +18,7 @@
 
 <link rel="import" href="menu-element.html">
 <link rel="import" href="controls/paper-tree-item.html">
+<link rel="import" href="configViews/test-data-config-view.html">
 
 <dom-module id="test-config-page">
     <link rel="import" type="css" href="css/styles.css">
@@ -25,6 +26,14 @@
         <style include="iron-flex iron-flex-alignment">
             paper-card {
                 margin: 0 2rem;
+            }
+            iron-pages {
+                margin: 0 2rem 0 0;
+                width: 100%;
+            }
+            iron-pages > * {
+                width: 100%;
+                display: block;
             }
             .container > paper-card.tree-container {
                 width: 20%;
@@ -45,10 +54,11 @@
                     </paper-tree-item>
                 </div>
             </paper-card>
-            <paper-card>
-                <div class="card-content">
-                </div>
-            </paper-card>
+            <iron-pages selected="[[selected.type]]"
+                        attr-for-selected="name"
+                        role="main">
+                <test-data-config-view name="test" data="[[selected]]"></test-data-config-view>
+            </iron-pages>
         </div>
 
         <paper-dialog id="error" modal>
@@ -74,6 +84,7 @@
                         reflectToAttribute: true
                     },
                     test: Object,
+                    groups: Array,
                     selected: {
                         type: Object,
                         observer: '_selectedChanged'
@@ -106,7 +117,7 @@
             }
 
             _selectedChanged(selected) {
-                console.log(selected);
+                // console.log(selected);
             }
 
             _deserialize(id) {
@@ -116,10 +127,23 @@
                 }
 
                 let parts = id.split("-");
-                this.selected = {
+                let selected = {
                     type: parts[0],
                     id: +parts[1]
                 };
+                switch (this.selected.type) {
+                    case TestConfigPage.PART_TYPES.TEST:
+                        selected.element = this.test;
+                        break;
+                    case TestConfigPage.PART_TYPES.GROUP:
+                        selected.element = this.groups.find(element => element.id == selected.id);
+                        break;
+                    case TestConfigPage.PART_TYPES.QUESTION:
+                        selected.element = TestConfigPage._findQuestion(selected.id, this.groups);
+                        break;
+                }
+
+                this.selected = selected;
             }
 
             _handleTest(event, response) {
@@ -128,7 +152,8 @@
                 if (!this.get('selected')) {
                     this.selected = {
                         type: TestConfigPage.PART_TYPES.TEST,
-                        id: test.id
+                        id: test.id,
+                        element: test
                     };
                 }
                 this.$.getTestGroups.generateRequest();
@@ -146,6 +171,16 @@
                     case 500:
                         this.$.error.open();
                         break;
+                }
+            }
+
+            static _findQuestion(id, groups) {
+                for (let group in groups) {
+                    for (let question in group.questions) {
+                        if (question.id == id) {
+                            return question;
+                        }
+                    }
                 }
             }
 

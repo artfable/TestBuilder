@@ -1,0 +1,67 @@
+<link rel="import" href="../libs/polymer-elements/polymer/polymer-element.html">
+
+<link rel="import" href="../libs/polymer-elements/paper-card/paper-card.html">
+<link rel="import" href="../libs/polymer-elements/paper-button/paper-button.html">
+<link rel="import" href="../libs/polymer-elements/paper-input/paper-input.html">
+<link rel="import" href="../libs/polymer-elements/paper-input/paper-textarea.html">
+
+<link rel="import" href="../libs/polymer-elements/paper-styles/paper-styles.html">
+<link rel="import" href="../custom-styles.html">
+
+<dom-module id="test-data-config-view">
+    <link rel="import" type="css" href="../css/styles.css">
+    <template>
+        <style>
+            :host {
+
+            }
+            paper-card {
+                width: 100%;
+            }
+            .card-actions {
+                display: flex;
+                justify-content: flex-end;
+            }
+        </style>
+
+        <paper-card>
+            <div class="card-content">
+                <paper-input label="Name" value="[[test.name]]"></paper-input>
+                <paper-textarea label="Description" value="[[test.description]]"></paper-textarea>
+                <paper-textarea label="Comment (not visible for no-admin users)" value="[[test.comment]]"></paper-textarea>
+            </div>
+            <div class="card-actions">
+                <paper-button class="success-btn">Save</paper-button>
+            </div>
+        </paper-card>
+    </template>
+
+    <script>
+        class TestDataConfigView extends Polymer.Element {
+            static get is() { return 'test-data-config-view'; }
+
+            static get properties() {
+                return {
+                    data: {
+                        type: Object,
+                        observer: '_onDataChanged'
+                    },
+                    test: Object
+                };
+            }
+
+            static get TYPE() {
+                return "test";
+            }
+
+            _onDataChanged(data) {
+                if (data.type == TestDataConfigView.TYPE) {
+                    this.test = data.element;
+                }
+            }
+
+        }
+
+        window.customElements.define(TestDataConfigView.is, TestDataConfigView);
+    </script>
+</dom-module>
