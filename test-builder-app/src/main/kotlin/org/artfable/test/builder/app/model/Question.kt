@@ -21,7 +21,7 @@ data class Question(
 ) {
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "GROUP_ID")
     var questionGroup: QuestionGroup? = null
 

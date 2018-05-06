@@ -32,4 +32,20 @@ public class QuestionService {
         questionGroup.getQuestions().add(question);
         return questionRepository.saveAndFlush(question);
     }
+
+    @Transactional
+    public Question updateQuestion(long groupId, long questionId, Question question) {
+        if (question.getId() == null || question.getId() != questionId) {
+            throw new IllegalArgumentException("questionId is incorrect");
+        }
+        QuestionGroup questionGroup = questionGroupRepository.findById(groupId).orElseThrow(() -> new IllegalArgumentException("No group with id [" + groupId + "]"));
+        Question oldQuestion = questionRepository.findById(questionId).orElseThrow(() -> new IllegalArgumentException("Question with id [" + questionId + "] isn't exist"));
+
+        if (!oldQuestion.getQuestionGroup().equals(questionGroup)) {
+            throw new IllegalArgumentException("Incorrect group for the question");
+        }
+
+        question.setQuestionGroup(questionGroup);
+        return questionRepository.saveAndFlush(question);
+    }
 }

@@ -7,13 +7,14 @@
 <link rel="import" href="../libs/polymer-elements/paper-input/paper-textarea.html">
 <link rel="import" href="../libs/polymer-elements/paper-dialog/paper-dialog.html">
 
+<link rel="import" href="../libs/polymer-elements/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../libs/polymer-elements/paper-styles/paper-styles.html">
 <link rel="import" href="../custom-styles.html">
 
-<dom-module id="test-data-config-view">
+<dom-module id="group-data-config-view">
     <link rel="import" type="css" href="../css/styles.css">
     <template>
-        <style>
+        <style include="iron-flex iron-flex-alignment">
             :host {
 
             }
@@ -24,16 +25,31 @@
                 display: flex;
                 justify-content: flex-end;
             }
+            .layout > .col:not(:first-of-type) {
+                margin-left: 1%;
+            }
+            .layout > .col:not(:last-of-type) {
+                margin-right: 1%;
+            }
+            .horizontal > .col-half:not(:last-of-type, :first-of-type) {
+                width: 48%;
+            }
+            .horizontal > .col-half:first-of-type, .horizontal > .col-half:last-of-type {
+                width: 49%;
+            }
         </style>
 
         <paper-card>
             <div class="card-content">
-                <paper-input label="Name" value="{{test.name}}"></paper-input>
-                <paper-textarea label="Description" value="{{test.description}}"></paper-textarea>
-                <paper-textarea label="Comment (not visible for no-admin users)" value="{{test.comment}}"></paper-textarea>
+                <paper-input label="Name" value="{{group.name}}"></paper-input>
+                <paper-textarea label="Description" value="{{group.description}}"></paper-textarea>
+                <div class="layout horizontal">
+                    <paper-input class="col col-half" label="Points" type="number" value="{{group.points}}"></paper-input>
+                    <paper-input class="col col-half" label="Question amount (how many question will be taken)" type="number" value="{{group.questionAmount}}"></paper-input>
+                </div>
             </div>
             <div class="card-actions">
-                <paper-button class="success-btn" on-click="saveTest">Save</paper-button>
+                <paper-button class="success-btn" on-click="saveGroup">Save</paper-button>
             </div>
         </paper-card>
 
@@ -44,12 +60,12 @@
             </div>
         </paper-dialog>
 
-        <iron-ajax id="updateTest" url="/api/tests/[[test.id]]" method="PUT" content-type="application/json" handle-as="json" on-error="_handleError"></iron-ajax>
+        <iron-ajax id="updateGroup" url="/api/tests/[[testId]]/questionGroups/[[group.id]]" method="PUT" content-type="application/json" handle-as="json" on-error="_handleError"></iron-ajax>
     </template>
 
     <script>
-        class TestDataConfigView extends Polymer.Element {
-            static get is() { return 'test-data-config-view'; }
+        class GroupDataConfigView extends Polymer.Element {
+            static get is() { return 'group-data-config-view'; }
 
             static get properties() {
                 return {
@@ -57,22 +73,24 @@
                         type: Object,
                         observer: '_onDataChanged'
                     },
-                    test: Object
+                    group: Object,
+                    testId: String
                 };
             }
 
             static get TYPE() {
-                return "test";
+                return "group";
             }
 
-            saveTest() {
-                this.$.updateTest.body = this.test;
-                this.$.updateTest.generateRequest();
+            saveGroup() {
+                this.$.updateGroup.body = this.group;
+                this.$.updateGroup.generateRequest();
             }
 
             _onDataChanged(data) {
-                if (data.type == TestDataConfigView.TYPE) {
-                    this.test = data.element;
+                if (data.type == GroupDataConfigView.TYPE) {
+                    this.group = data.element;
+                    this.testId = data.testId;
                 }
             }
 
@@ -89,6 +107,6 @@
 
         }
 
-        window.customElements.define(TestDataConfigView.is, TestDataConfigView);
+        window.customElements.define(GroupDataConfigView.is, GroupDataConfigView);
     </script>
 </dom-module>

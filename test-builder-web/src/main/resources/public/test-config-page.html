@@ -19,6 +19,8 @@
 <link rel="import" href="menu-element.html">
 <link rel="import" href="controls/paper-tree-item.html">
 <link rel="import" href="configViews/test-data-config-view.html">
+<link rel="import" href="configViews/group-data-config-view.html">
+<link rel="import" href="configViews/question-data-config-view.html">
 
 <dom-module id="test-config-page">
     <link rel="import" type="css" href="css/styles.css">
@@ -58,6 +60,8 @@
                         attr-for-selected="name"
                         role="main">
                 <test-data-config-view name="test" data="[[selected]]"></test-data-config-view>
+                <group-data-config-view name="group" data="[[selected]]"></group-data-config-view>
+                <question-data-config-view name="question" data="[[selected]]"></question-data-config-view>
             </iron-pages>
         </div>
 
@@ -117,7 +121,7 @@
             }
 
             _selectedChanged(selected) {
-                // console.log(selected);
+                console.log(selected);
             }
 
             _deserialize(id) {
@@ -131,15 +135,19 @@
                     type: parts[0],
                     id: +parts[1]
                 };
-                switch (this.selected.type) {
+                switch (selected.type) {
                     case TestConfigPage.PART_TYPES.TEST:
                         selected.element = this.test;
                         break;
                     case TestConfigPage.PART_TYPES.GROUP:
                         selected.element = this.groups.find(element => element.id == selected.id);
+                        selected.testId = this.test.id;
                         break;
                     case TestConfigPage.PART_TYPES.QUESTION:
-                        selected.element = TestConfigPage._findQuestion(selected.id, this.groups);
+                        let searchResult = TestConfigPage._findQuestion(selected.id, this.groups);
+                        selected.element = searchResult.question;
+                        selected.testId = this.test.id;
+                        selected.groupId = searchResult.group.id;
                         break;
                 }
 
@@ -175,10 +183,14 @@
             }
 
             static _findQuestion(id, groups) {
-                for (let group in groups) {
-                    for (let question in group.questions) {
-                        if (question.id == id) {
-                            return question;
+                for (let groupIndex in groups) {
+                    let questions = groups[groupIndex].questions;
+                    for (let questionIndex in questions) {
+                        if (questions[questionIndex].id == id) {
+                            return {
+                                group: groups[groupIndex],
+                                question: questions[questionIndex]
+                            };
                         }
                     }
                 }

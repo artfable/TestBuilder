@@ -14,17 +14,17 @@ import kotlin.collections.HashSet
 @Table(name = "QUESTION_GROUPS")
 data class QuestionGroup(
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null,
-        val name: String = "",
-        val description: String = "",
-        @Column(name = "QUESTION_AMOUNT") val questionAmount: Int = 0,
-        val points: Int = 0,
-        @OneToMany(fetch = FetchType.EAGER, cascade = [CascadeType.ALL])
+        var name: String = "",
+        var description: String = "",
+        @Column(name = "QUESTION_AMOUNT") var questionAmount: Int = 0,
+        var points: Int = 0,
+        @OneToMany(fetch = FetchType.EAGER)
         @JoinColumn(name = "GROUP_ID", referencedColumnName = "ID")
         val questions: Set<Question> = HashSet()
 ) {
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TEST_ID")
     var test: Test? = null
 

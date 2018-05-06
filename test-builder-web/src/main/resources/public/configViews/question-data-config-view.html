@@ -10,7 +10,7 @@
 <link rel="import" href="../libs/polymer-elements/paper-styles/paper-styles.html">
 <link rel="import" href="../custom-styles.html">
 
-<dom-module id="test-data-config-view">
+<dom-module id="question-data-config-view">
     <link rel="import" type="css" href="../css/styles.css">
     <template>
         <style>
@@ -28,12 +28,11 @@
 
         <paper-card>
             <div class="card-content">
-                <paper-input label="Name" value="{{test.name}}"></paper-input>
-                <paper-textarea label="Description" value="{{test.description}}"></paper-textarea>
-                <paper-textarea label="Comment (not visible for no-admin users)" value="{{test.comment}}"></paper-textarea>
+                <paper-input label="Question" value="{{question.text}}"></paper-input>
+                <paper-textarea label="Comment (not visible for no-admin users)" value="{{question.comment}}"></paper-textarea>
             </div>
             <div class="card-actions">
-                <paper-button class="success-btn" on-click="saveTest">Save</paper-button>
+                <paper-button class="success-btn" on-click="saveQuestion">Save</paper-button>
             </div>
         </paper-card>
 
@@ -44,12 +43,12 @@
             </div>
         </paper-dialog>
 
-        <iron-ajax id="updateTest" url="/api/tests/[[test.id]]" method="PUT" content-type="application/json" handle-as="json" on-error="_handleError"></iron-ajax>
+        <iron-ajax id="updateQuestion" url="/api/tests/[[testId]]/questionGroups/[[groupId]]/questions/[[question.id]]" method="PUT" content-type="application/json" handle-as="json" on-error="_handleError"></iron-ajax>
     </template>
 
     <script>
-        class TestDataConfigView extends Polymer.Element {
-            static get is() { return 'test-data-config-view'; }
+        class QuestionDataConfigView extends Polymer.Element {
+            static get is() { return 'question-data-config-view'; }
 
             static get properties() {
                 return {
@@ -57,22 +56,26 @@
                         type: Object,
                         observer: '_onDataChanged'
                     },
-                    test: Object
+                    question: Object,
+                    testId: String,
+                    groupId: String
                 };
             }
 
             static get TYPE() {
-                return "test";
+                return "question";
             }
 
-            saveTest() {
-                this.$.updateTest.body = this.test;
-                this.$.updateTest.generateRequest();
+            saveQuestion() {
+                this.$.updateQuestion.body = this.question;
+                this.$.updateQuestion.generateRequest();
             }
 
             _onDataChanged(data) {
-                if (data.type == TestDataConfigView.TYPE) {
-                    this.test = data.element;
+                if (data.type == QuestionDataConfigView.TYPE) {
+                    this.question = data.element;
+                    this.testId = data.testId;
+                    this.groupId = data.groupId;
                 }
             }
 
@@ -89,6 +92,6 @@
 
         }
 
-        window.customElements.define(TestDataConfigView.is, TestDataConfigView);
+        window.customElements.define(QuestionDataConfigView.is, QuestionDataConfigView);
     </script>
 </dom-module>

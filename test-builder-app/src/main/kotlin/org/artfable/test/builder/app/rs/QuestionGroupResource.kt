@@ -26,4 +26,9 @@ class QuestionGroupResource {
     fun createQuestionGroup(@PathVariable("testId") testId: Long, @RequestBody questionGroup: QuestionGroup): ResponseEntity<Any?> {
         return ResponseEntity.ok(questionGroupService.createQuestionGroup(testId, questionGroup))
     }
+
+    @RequestMapping(method = [RequestMethod.PUT], path = ["/{groupId}"])
+    fun updateQuestionGroup(@PathVariable("testId") testId: Long, @PathVariable("groupId") groupId: Long, @RequestBody questionGroup: QuestionGroup): ResponseEntity<Any?> {
+        return ResponseEntity.ok(questionGroupService.updateQuestionGroup(testId, groupId, questionGroup))
+    }
 }

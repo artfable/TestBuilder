@@ -4,11 +4,14 @@ import org.artfable.test.builder.app.data.QuestionGroupRepository;
 import org.artfable.test.builder.app.data.TestRepository;
 import org.artfable.test.builder.app.model.QuestionGroup;
 import org.artfable.test.builder.app.model.Test;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author artfable
@@ -39,6 +42,24 @@ public class QuestionGroupService {
 
         questionGroup.setTest(test);
         test.getQuestionGroups().add(questionGroup);
+        return questionGroupRepository.saveAndFlush(questionGroup);
+    }
+
+    @Transactional
+    public QuestionGroup updateQuestionGroup(long testId, long groupId, QuestionGroup questionGroup) {
+        if (questionGroup.getId() == null || questionGroup.getId() != groupId) {
+            throw new IllegalArgumentException("groupId is incorrect");
+        }
+        Test test = testRepository.findById(testId).orElseThrow(() -> new IllegalArgumentException("No test with id [" + testId + "]"));
+        QuestionGroup oldGroup = questionGroupRepository.findById(groupId)
+                .orElseThrow(() -> new IllegalArgumentException("No group with id [" + groupId + "]"));
+        if (!oldGroup.getTest().equals(test)) {
+            throw new IllegalArgumentException("Incorrect test for group");
+        }
+
+        questionGroup.setTest(test);
+        questionGroup.getQuestions().clear();
+        questionGroup.getQuestions().addAll(oldGroup.getQuestions());
         return questionGroupRepository.saveAndFlush(questionGroup);
     }
 }

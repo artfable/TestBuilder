@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*
  * 28.04.18
  */
 @RestController
-@RequestMapping(path = ["/api/tests/{testId}/questionGroups/{groupId}"])
+@RequestMapping(path = ["/api/tests/{testId}/questionGroups/{groupId}/questions"])
 class QuestionResource {
 
     @Autowired
@@ -20,5 +20,10 @@ class QuestionResource {
     @RequestMapping(method = [RequestMethod.POST])
     fun createQuestion(@PathVariable("groupId") groupId: Long, @RequestBody question: Question): ResponseEntity<Any?> {
         return ResponseEntity.ok(questionService.createQuestion(groupId, question))
+    }
+
+    @RequestMapping(method = [RequestMethod.PUT], path = ["/{questionId}"])
+    fun updateQuestion(@PathVariable("groupId") groupId: Long, @PathVariable("questionId") questionId: Long, @RequestBody question: Question): ResponseEntity<Any?> {
+        return ResponseEntity.ok(questionService.updateQuestion(groupId, questionId, question))
     }
 }
