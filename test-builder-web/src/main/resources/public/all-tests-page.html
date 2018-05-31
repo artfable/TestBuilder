@@ -51,7 +51,7 @@
                                 <td on-click="navigateToTestConfig" class="clickable">[[item.name]]</td>
                                 <td>[[item.comment]]</td>
                                 <td>
-                                    <paper-button class="table-btn remove-btn" on-click="removeTest">
+                                    <paper-button class="table-btn remove-icon-btn" on-click="removeTest">
                                         <iron-icon icon="icons:delete-forever"></iron-icon>
                                     </paper-button>
                                 </td>
@@ -83,7 +83,7 @@
         <paper-dialog id="removeTestDialog" modal>
             <p>Whole test's configuration will be gone. Are you sure you want to delete it?</p>
             <div class="buttons">
-                <paper-button class="remove-btn" dialog-confirm on-click="_onRemoveTest">Delete</paper-button>
+                <paper-button class="remove-icon-btn" dialog-confirm on-click="_onRemoveTest">Delete</paper-button>
                 <paper-button dialog-dismiss autofocus>Cancel</paper-button>
             </div>
         </paper-dialog>

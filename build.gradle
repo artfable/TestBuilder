@@ -68,6 +68,7 @@ buildscript {
         spring_boot_version = '2.0.0.RELEASE'
         spring_dependency_version = '1.0.4.RELEASE'
         sass_version = '0.0.1'
+        npm_version = '0.0.2'
     }
 
     repositories {
@@ -81,6 +82,7 @@ buildscript {
         classpath "io.spring.gradle:dependency-management-plugin:$spring_dependency_version"
         classpath("org.springframework.boot:spring-boot-gradle-plugin:$spring_boot_version")
         classpath "com.github.artfable.gradle:gradle-sass-plugin:$sass_version"
+        classpath "com.github.artfable.gradle:gradle-npm-repository-plugin:$npm_version"
     }
 
 }

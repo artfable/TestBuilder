@@ -1,5 +1,6 @@
 package org.artfable.test.builder.app.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import javax.persistence.*
 
 /**
@@ -11,5 +12,10 @@ import javax.persistence.*
 data class Answer(
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null,
         val text: String = "",
-        val correct: Boolean = false
-)
+        var correct: Boolean = false
+) {
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "QUESTION_ID")
+    var question: Question? = null
+}

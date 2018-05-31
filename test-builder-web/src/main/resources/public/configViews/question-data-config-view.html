@@ -20,6 +20,9 @@
             paper-card {
                 width: 100%;
             }
+            .action-col {
+                width: 10%;
+            }
             .card-actions {
                 display: flex;
                 justify-content: flex-end;
@@ -30,11 +33,50 @@
             <div class="card-content">
                 <paper-input label="Question" value="{{question.text}}"></paper-input>
                 <paper-textarea label="Comment (not visible for no-admin users)" value="{{question.comment}}"></paper-textarea>
+
+                <h2>Answers</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Right</th>
+                            <th class="action-col">
+                                <paper-button class="success-icon-btn" on-click="createAnswer">
+                                    <iron-icon icon="icons:add"></iron-icon>
+                                </paper-button>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template is="dom-repeat" items="{{answers}}">
+                            <tr>
+                                <td>[[item.text]]</td>
+                                <td>[[item.correct]]</td>
+                                <td>
+                                    <paper-button class="table-btn remove-icon-btn" on-click="removeAnswer">
+                                        <iron-icon icon="icons:delete-forever"></iron-icon>
+                                    </paper-button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
             </div>
             <div class="card-actions">
                 <paper-button class="success-btn" on-click="saveQuestion">Save</paper-button>
             </div>
         </paper-card>
+
+        <paper-dialog id="createAnswerDialog" no-cancel-on-outside-click with-backdrop class="small-dialog">
+            <div>
+                <paper-textarea label="Text" auto-validate="true" value="{{newAnswer.text}}" autofocus
+                             pattern=".+" error-message="Name should be specified"></paper-textarea>
+            </div>
+            <div class="buttons">
+                <paper-button dialog-confirm on-click="_onSaveNewAnswer">Save</paper-button>
+                <paper-button dialog-dismiss>Close</paper-button>
+            </div>
+        </paper-dialog>
 
         <paper-dialog id="error" modal>
             <p>Server-side error. Please try later or call to the business support.</p>
@@ -44,6 +86,8 @@
         </paper-dialog>
 
         <iron-ajax id="updateQuestion" url="/api/tests/[[testId]]/questionGroups/[[groupId]]/questions/[[question.id]]" method="PUT" content-type="application/json" handle-as="json" on-error="_handleError"></iron-ajax>
+        <iron-ajax id="getAnswers" url="/api/tests/[[testId]]/questionGroups/[[groupId]]/questions/[[question.id]]/answers" method="GET" content-type="application/json" handle-as="json" on-error="_handleError" on-response="_handleAnswers"></iron-ajax>
+        <iron-ajax id="saveAnswer" url="/api/tests/[[testId]]/questionGroups/[[groupId]]/questions/[[question.id]]/answers" method="POST" content-type="application/json" handle-as="json" on-error="_handleError" on-response="_updateAnswers"></iron-ajax>
     </template>
 
     <script>
@@ -56,6 +100,8 @@
                         type: Object,
                         observer: '_onDataChanged'
                     },
+                    answers: Array,
+                    newAnswer: Object,
                     question: Object,
                     testId: String,
                     groupId: String
@@ -71,12 +117,31 @@
                 this.$.updateQuestion.generateRequest();
             }
 
+            createAnswer() {
+                this.newAnswer = {};
+                this.$.createAnswerDialog.open();
+            }
+
+            _onSaveNewAnswer() {
+                this.$.saveAnswer.body = this.newAnswer;
+                this.$.saveAnswer.generateRequest();
+            }
+
             _onDataChanged(data) {
                 if (data.type == QuestionDataConfigView.TYPE) {
                     this.question = data.element;
                     this.testId = data.testId;
                     this.groupId = data.groupId;
+                    this.$.getAnswers.generateRequest();
                 }
+            }
+
+            _handleAnswers(event, response) {
+                this.answers = response.parseResponse();
+            }
+
+            _updateAnswers() {
+                this.$.getAnswers.generateRequest();
             }
 
             _handleError(event, detail) {
