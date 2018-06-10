@@ -4,8 +4,6 @@ import org.artfable.test.builder.app.data.QuestionGroupRepository;
 import org.artfable.test.builder.app.data.TestRepository;
 import org.artfable.test.builder.app.model.QuestionGroup;
 import org.artfable.test.builder.app.model.Test;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,5 +59,15 @@ public class QuestionGroupService {
         questionGroup.getQuestions().clear();
         questionGroup.getQuestions().addAll(oldGroup.getQuestions());
         return questionGroupRepository.saveAndFlush(questionGroup);
+    }
+
+    @Transactional
+    public void deleteQuestionGroup(long testId, long groupId) {
+        Test test = testRepository.findById(testId).orElseThrow(() -> new IllegalArgumentException("No test with id [" + testId + "]"));
+        if (test.getQuestionGroups().stream().noneMatch(questionGroup -> Objects.equals(questionGroup.getId(), groupId))) {
+            throw new IllegalArgumentException("Test with id [" + testId + "] doesn't contains [" + groupId + "]");
+        }
+
+        questionGroupRepository.deleteById(groupId);
     }
 }

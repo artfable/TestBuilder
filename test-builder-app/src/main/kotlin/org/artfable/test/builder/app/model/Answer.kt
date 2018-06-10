@@ -15,7 +15,7 @@ data class Answer(
         var correct: Boolean = false
 ) {
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinColumn(name = "QUESTION_ID")
     var question: Question? = null
 }

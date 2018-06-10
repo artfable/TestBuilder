@@ -61,4 +61,8 @@
             <column name="CORRECT" type="NUMBER(1)"/>
         </createTable>
     </changeSet>
+
+    <changeSet id="app-model-3" author="artfable">
+        <dropNotNullConstraint tableName="ANSWERS" columnName="QUESTION_ID" columnDataType="BIGINT"/>
+    </changeSet>
 </databaseChangeLog>

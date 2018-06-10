@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 /**
  * @author artfable
  * 28.04.18
@@ -46,6 +48,17 @@ public class QuestionService {
         }
 
         question.setQuestionGroup(questionGroup);
+        question.getAnswers().forEach(answer -> answer.setQuestion(question));
         return questionRepository.saveAndFlush(question);
+    }
+
+    @Transactional
+    public void deleteQuestion(long groupId, long questionId) {
+        QuestionGroup questionGroup = questionGroupRepository.findById(groupId).orElseThrow(() -> new IllegalArgumentException("No group with id [" + groupId + "]"));
+        if (questionGroup.getQuestions().stream().noneMatch(question -> Objects.equals(question.getId(), questionId))) {
+            throw new IllegalArgumentException("Group with id [" + groupId + "] doesn't have question [" + questionId + "]");
+        }
+
+        questionRepository.deleteById(questionId);
     }
 }

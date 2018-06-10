@@ -6,6 +6,7 @@
 <link rel="import" href="../libs/polymer-elements/paper-input/paper-input.html">
 <link rel="import" href="../libs/polymer-elements/paper-input/paper-textarea.html">
 <link rel="import" href="../libs/polymer-elements/paper-dialog/paper-dialog.html">
+<link rel="import" href="../libs/polymer-elements/paper-checkbox/paper-checkbox.html">
 
 <link rel="import" href="../libs/polymer-elements/paper-styles/paper-styles.html">
 <link rel="import" href="../custom-styles.html">
@@ -51,7 +52,7 @@
                         <template is="dom-repeat" items="{{answers}}">
                             <tr>
                                 <td>[[item.text]]</td>
-                                <td>[[item.correct]]</td>
+                                <td><paper-checkbox checked="{{item.correct}}"></paper-checkbox></td>
                                 <td>
                                     <paper-button class="table-btn remove-icon-btn" on-click="removeAnswer">
                                         <iron-icon icon="icons:delete-forever"></iron-icon>
@@ -87,7 +88,6 @@
 
         <iron-ajax id="updateQuestion" url="/api/tests/[[testId]]/questionGroups/[[groupId]]/questions/[[question.id]]" method="PUT" content-type="application/json" handle-as="json" on-error="_handleError"></iron-ajax>
         <iron-ajax id="getAnswers" url="/api/tests/[[testId]]/questionGroups/[[groupId]]/questions/[[question.id]]/answers" method="GET" content-type="application/json" handle-as="json" on-error="_handleError" on-response="_handleAnswers"></iron-ajax>
-        <iron-ajax id="saveAnswer" url="/api/tests/[[testId]]/questionGroups/[[groupId]]/questions/[[question.id]]/answers" method="POST" content-type="application/json" handle-as="json" on-error="_handleError" on-response="_updateAnswers"></iron-ajax>
     </template>
 
     <script>
@@ -114,6 +114,7 @@
 
             saveQuestion() {
                 this.$.updateQuestion.body = this.question;
+                this.$.updateQuestion.body.answers = this.answers;
                 this.$.updateQuestion.generateRequest();
             }
 
@@ -123,8 +124,7 @@
             }
 
             _onSaveNewAnswer() {
-                this.$.saveAnswer.body = this.newAnswer;
-                this.$.saveAnswer.generateRequest();
+                this.push('answers', this.newAnswer);
             }
 
             _onDataChanged(data) {
@@ -138,10 +138,6 @@
 
             _handleAnswers(event, response) {
                 this.answers = response.parseResponse();
-            }
-
-            _updateAnswers() {
-                this.$.getAnswers.generateRequest();
             }
 
             _handleError(event, detail) {

@@ -1,6 +1,7 @@
 package org.artfable.test.builder.app.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import javax.persistence.*
 
 /**
@@ -14,10 +15,10 @@ data class Question(
         val text: String = "",
         val comment: String = "",
         val type: Type = Type.SINGLE,
-        @JsonIgnore
+        @get:JsonIgnore @set:JsonProperty("answers")
         @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
         @JoinColumn(name = "QUESTION_ID", referencedColumnName = "ID")
-        val answers: Set<Answer> = HashSet()
+        var answers: Set<Answer> = HashSet()
 ) {
 
     @JsonIgnore

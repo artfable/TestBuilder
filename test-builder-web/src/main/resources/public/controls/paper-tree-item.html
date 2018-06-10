@@ -1,14 +1,17 @@
 <link rel="import" href="../libs/polymer-elements/polymer/polymer-element.html">
 
 <link rel="import" href="../libs/polymer-elements/iron-icons/iron-icons.html">
+<link rel="import" href="../libs/polymer-elements/paper-button/paper-button.html">
 <link rel="import" href="../libs/polymer-elements/polymer/lib/utils/flattened-nodes-observer.html">
 
 <link rel="import" href="../libs/polymer-elements/paper-styles/paper-styles.html">
 <link rel="import" href="../libs/polymer-elements/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../libs/polymer-elements/iron-icons/iron-icons.html">
 
 <link rel="import" href="../custom-styles.html">
 
 <dom-module id="paper-tree-item">
+    <link rel="import" type="css" href="../css/styles.css">
     <template>
         <style include="custom-styles iron-flex iron-flex-alignment">
             .tree-item-children {
@@ -22,6 +25,15 @@
             #treeItemHeader.selected {
                 background-color: var(--dark-theme-selected-item);
             }
+            #iconBtnContainer {
+                display: flex;
+                margin-left: auto;
+            }
+            .icon-btn {
+                margin: 0;
+                padding: 0;
+                min-width: 0;
+            }
         </style>
 
         <div id="treeItemHeader" class="layout horizontal" on-click="select">
@@ -29,6 +41,18 @@
                 <iron-icon class="expand-icon" icon="[[icon]]" on-click="expand"></iron-icon>
             </template>
             <div>[[value]]</div>
+            <div id="iconBtnContainer">
+                <template is="dom-if" if="{{addEnable}}">
+                    <paper-button class="icon-btn success-icon-btn" on-click="add">
+                        <iron-icon icon="icons:add"></iron-icon>
+                    </paper-button>
+                </template>
+                <template is="dom-if" if="{{removeEnable}}">
+                    <paper-button class="icon-btn remove-icon-btn" on-click="remove">
+                        <iron-icon icon="icons:remove"></iron-icon>
+                    </paper-button>
+                </template>
+            </div>
         </div>
         <template is="dom-if" if="{{expanded}}">
             <div class="tree-item-children">
@@ -57,6 +81,14 @@
                     expanded: {
                         type: Boolean,
                         value: false,
+                        reflectToAttribute: true
+                    },
+                    addEnable: {
+                        type: Boolean,
+                        reflectToAttribute: true
+                    },
+                    removeEnable: {
+                        type: Boolean,
                         reflectToAttribute: true
                     },
                     selected: Boolean,
@@ -115,6 +147,28 @@
                 }
                 [].filter.call(this.children, element => element instanceof PaperTreeItem)
                     .forEach(item => item.unselect(ignore));
+            }
+
+            add(event) {
+                event.stopPropagation();
+                this.dispatchEvent(new CustomEvent('add', {
+                    bubbles: true,
+                    detail: {
+                        id: this.get('valueId'),
+                        value: this.get('value')
+                    }
+                }));
+            }
+
+            remove(event) {
+                event.stopPropagation();
+                this.dispatchEvent(new CustomEvent('remove', {
+                    bubbles: true,
+                    detail: {
+                        id: this.get('valueId'),
+                        value: this.get('value')
+                    }
+                }));
             }
 
             isLeaf() {

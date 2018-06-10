@@ -29,4 +29,11 @@ class QuestionResource {
     fun updateQuestion(@PathVariable("groupId") groupId: Long, @PathVariable("questionId") questionId: Long, @RequestBody question: Question): ResponseEntity<Any?> {
         return ResponseEntity.ok(questionService.updateQuestion(groupId, questionId, question))
     }
+
+    @RequestMapping(method = [RequestMethod.DELETE], path = ["/{questionId}"])
+    @PreAuthorize("hasAuthority('ADMIN')")
+    fun deleteQuestion(@PathVariable("groupId") groupId: Long, @PathVariable("questionId") questionId: Long): ResponseEntity<Any?> {
+        questionService.deleteQuestion(groupId, questionId)
+        return ResponseEntity.ok().build()
+    }
 }

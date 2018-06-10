@@ -35,4 +35,11 @@ class QuestionGroupResource {
     fun updateQuestionGroup(@PathVariable("testId") testId: Long, @PathVariable("groupId") groupId: Long, @RequestBody questionGroup: QuestionGroup): ResponseEntity<Any?> {
         return ResponseEntity.ok(questionGroupService.updateQuestionGroup(testId, groupId, questionGroup))
     }
+
+    @RequestMapping(method = [RequestMethod.DELETE], path = ["/{groupId}"])
+    @PreAuthorize("hasAuthority('ADMIN')")
+    fun deleteQuestionGroup(@PathVariable("testId") testId: Long, @PathVariable("groupId") groupId: Long): ResponseEntity<Any?> {
+        questionGroupService.deleteQuestionGroup(testId, groupId)
+        return ResponseEntity.ok().build()
+    }
 }

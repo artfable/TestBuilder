@@ -45,11 +45,11 @@
         <div class="layout container">
             <paper-card class="tree-container">
                 <div class="card-content">
-                    <paper-tree-item id="treeRoot" value-id="test-[[test.id]]" value="[[test.name]]">
+                    <paper-tree-item id="treeRoot" value-id="test-[[test.id]]" value="[[test.name]]" add-enable="true">
                         <template is="dom-repeat" items="{{groups}}" as="group">
-                            <paper-tree-item value-id="group-[[group.id]]" value="[[group.name]]">
+                            <paper-tree-item value-id="group-[[group.id]]" value="[[group.name]]" add-enable="true" remove-enable="true">
                                 <template is="dom-repeat" items="{{group.questions}}">
-                                    <paper-tree-item value-id="question-[[item.id]]" value="[[item.text]]"></paper-tree-item>
+                                    <paper-tree-item value-id="question-[[item.id]]" value="[[item.text]]" remove-enable="true"></paper-tree-item>
                                 </template>
                             </paper-tree-item>
                         </template>
@@ -74,6 +74,9 @@
 
         <iron-ajax id="getTest" url="/api/tests/[[testId]]" handle-as="json" on-response="_handleTest" on-error="_handleError"></iron-ajax>
         <iron-ajax id="getTestGroups" url="/api/tests/[[testId]]/questionGroups" handle-as="json" on-response="_handleGroups" on-error="_handleError"></iron-ajax>
+
+        <iron-ajax id="createStructureElement" method="POST" content-type="application/json" handle-as="json" on-response="_handleStructureChanged" on-error="_handleError"></iron-ajax>
+        <iron-ajax id="deleteStructureElement" method="DELETE" content-type="application/json" handle-as="json" on-response="_handleStructureChanged" on-error="_handleError"></iron-ajax>
     </template>
 
     <script>
@@ -111,7 +114,25 @@
 
             ready() {
                 super.ready();
-                this.$.treeRoot.addEventListener('select', event => this._deserialize(event.detail.id));
+                this.$.treeRoot.addEventListener('select', event => {
+                    this.selected = this._deserialize(event.detail.id);
+                });
+                this.$.treeRoot.addEventListener('add', event => {
+                    let item = this._deserialize(event.detail.id);
+                    let ajax = this.$.createStructureElement;
+                    ajax.url = TestConfigPage._getStructureURL(item, true);
+                    ajax.body = {
+                        name: 'New Group',
+                        text: 'New Question'
+                    };
+                    ajax.generateRequest();
+                });
+                this.$.treeRoot.addEventListener('remove', event => {
+                    let item = this._deserialize(event.detail.id);
+                    let ajax = this.$.deleteStructureElement;
+                    ajax.url = TestConfigPage._getStructureURL(item, false);
+                    ajax.generateRequest();
+                });
             }
 
             _testIdChanged(testId) {
@@ -121,37 +142,48 @@
             }
 
             _selectedChanged(selected) {
-                console.log(selected);
+                // console.log(selected);
             }
 
             _deserialize(id) {
                 if (!id) {
-                    this.set('selected', null);
-                    return;
+                    return null;
                 }
 
                 let parts = id.split("-");
-                let selected = {
+                let item = {
                     type: parts[0],
                     id: +parts[1]
                 };
-                switch (selected.type) {
+                switch (item.type) {
                     case TestConfigPage.PART_TYPES.TEST:
-                        selected.element = this.test;
+                        item.element = this.test;
                         break;
                     case TestConfigPage.PART_TYPES.GROUP:
-                        selected.element = this.groups.find(element => element.id == selected.id);
-                        selected.testId = this.test.id;
+                        item.element = this.groups.find(element => element.id == item.id);
+                        item.testId = this.test.id;
                         break;
                     case TestConfigPage.PART_TYPES.QUESTION:
-                        let searchResult = TestConfigPage._findQuestion(selected.id, this.groups);
-                        selected.element = searchResult.question;
-                        selected.testId = this.test.id;
-                        selected.groupId = searchResult.group.id;
+                        let searchResult = TestConfigPage._findQuestion(item.id, this.groups);
+                        item.element = searchResult.question;
+                        item.testId = this.test.id;
+                        item.groupId = searchResult.group.id;
                         break;
                 }
 
-                this.selected = selected;
+                return item;
+            }
+
+            static _getStructureURL(item, children) {
+                switch (item.type) {
+                    case TestConfigPage.PART_TYPES.TEST:
+                        return `/api/tests/${item.id}/questionGroups`;
+                    case TestConfigPage.PART_TYPES.GROUP:
+                        let url = `/api/tests/${item.testId}/questionGroups/${item.id}`;
+                        return children ? url + '/questions' : url;
+                    case TestConfigPage.PART_TYPES.QUESTION:
+                        return `/api/tests/${item.testId}/questionGroups/${item.groupId}/questions/${item.id}`;
+                }
             }
 
             _handleTest(event, response) {
@@ -169,6 +201,10 @@
 
             _handleGroups(event, response) {
                 this.groups = response.parseResponse();
+            }
+
+            _handleStructureChanged() {
+                this.$.getTest.generateRequest();
             }
 
             _handleError(event, detail) {
