@@ -41,7 +41,7 @@
                             <th>#</th>
                             <th>Name</th>
                             <th>Comment</th>
-                            <th></th>
+                            <th colspan="2"></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -53,6 +53,11 @@
                                 <td>
                                     <paper-button class="table-btn remove-icon-btn" on-click="removeTest">
                                         <iron-icon icon="icons:delete-forever"></iron-icon>
+                                    </paper-button>
+                                </td>
+                                <td>
+                                    <paper-button class="table-btn primary-icon-btn" on-click="printTest">
+                                        <iron-icon icon="icons:print"></iron-icon>
                                     </paper-button>
                                 </td>
                             </tr>
@@ -127,6 +132,11 @@
                 event.stopPropagation();
                 this.set('toDelete', event.model.get('item.id'));
                 this.$.removeTestDialog.open();
+            }
+
+            printTest(event) {
+                event.stopPropagation();
+                window.open("/printTest.html#" + event.model.get('item.id'), "_blank")
             }
 
             navigateToTestConfig(event) {

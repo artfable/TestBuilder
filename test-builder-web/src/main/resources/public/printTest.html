@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+
+        <script src="webjars/github-com-webcomponents-webcomponentsjs/v1.0.2/webcomponents-loader.js"></script>
+
+        <link rel="import" href="libs/polymer-elements/app-route/app-location.html">
+        <link rel="import" href="libs/polymer-elements/app-route/app-route.html">
+
+        <link rel="import" href="libs/polymer-elements/paper-styles/paper-styles.html">
+        <link rel="import" href="libs/polymer-elements/iron-ajax/iron-ajax.html">
+        <link rel="import" href="libs/polymer-elements/iron-flex-layout/iron-flex-layout.html">
+        <link rel="import" href="libs/polymer-elements/paper-styles/color.html">
+        <link rel="import" href="libs/polymer-elements/paper-styles/typography.html">
+        <link rel="import" href="libs/polymer-elements/paper-dialog/paper-dialog.html">
+        <link rel="import" href="libs/polymer-elements/paper-button/paper-button.html">
+        <link rel="import" href="libs/polymer-elements/paper-card/paper-card.html">
+        <link rel="import" href="libs/polymer-elements/paper-radio-button/paper-radio-button.html">
+        <link rel="import" href="libs/polymer-elements/paper-checkbox/paper-checkbox.html">
+
+        <link rel="import" href="libs/polymer-elements/polymer/lib/utils/render-status.html">
+
+        <dom-module id="print-page">
+            <template>
+                <style>
+                    :host {
+                        display: flex;
+                        justify-content: center;
+                    }
+
+                    paper-card {
+                        width: 80%;
+                    }
+                    .answer-container {
+                        display: flex;
+                        flex-direction: column;
+                    }
+                    .answer-container > paper-radio-button {
+                        margin-bottom: 0.5rem;
+                    }
+                </style>
+
+
+                <app-location
+                        route="{{route}}"
+                        use-hash-as-path>
+                </app-location>
+
+                <paper-card class="container">
+                    <div class="card-content">
+                        <h3>[[test.nameSnapshot]]</h3>
+                        <template is="dom-repeat" items="[[test.groups]]" as="group">
+                            <hr />
+                            <h4>[[group.name]]</h4>
+                            <template is="dom-repeat" items="[[group.questions]]" as="question">
+                                <h5>[[question.questionSnapshot]]</h5>
+                                <div class="answer-container">
+                                    <template is="dom-if" if="[[question.snapshotType == 'SINGLE']]">
+                                        <template is="dom-repeat" items="[[question.answers]]" as="answer">
+                                            <paper-radio-button>[[answer.text]]</paper-radio-button>
+                                        </template>
+                                    </template>
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+                </paper-card>
+
+                <paper-dialog id="error" modal>
+                    <p>Server-side error. Please try later or call to the business support.</p>
+                    <div class="buttons">
+                        <paper-button dialog-confirm autofocus>Close</paper-button>
+                    </div>
+                </paper-dialog>
+
+                <iron-ajax id="getTestForPrint" url="/api/tests/completed/print?testId=[[testId]]" handle-as="json" on-response="_handleTest" on-error="_handleError"></iron-ajax>
+            </template>
+
+            <script>
+                class Print extends Polymer.Element {
+                    static get is() { return 'print-page'; }
+
+                    static get properties() {
+                        return {
+                            testId: String,
+                            test: Object,
+                            route: {
+                                type: Object,
+                                observer: '_testIdChanged'
+                            }
+                        };
+                    }
+
+                    _testIdChanged(route) {
+                        this.testId = route.path;
+                        this.$.getTestForPrint.generateRequest();
+                    }
+
+                    _handleTest(event, response) {
+                        let test = response.parseResponse();
+                        let groups = {};
+                        test.questions.forEach(question => {
+                            let questionsByGroup = groups[question.groupSnapshot];
+                            if (!questionsByGroup) {
+                                questionsByGroup = [];
+                                groups[question.groupSnapshot] = questionsByGroup;
+                            }
+                            questionsByGroup.push(question);
+                            test.groups = [];
+                            for (let groupName in groups) {
+                                test.groups.push({
+                                    name: groupName,
+                                    questions: groups[groupName]
+                                });
+                            }
+                        });
+
+                        this.test = test;
+                        Polymer.RenderStatus.afterNextRender(this, () => window.print());
+                    }
+
+                    _handleError(event, detail) {
+                        switch (detail.request.status) {
+                            case 401:
+                                location = '/#/login';
+                                break;
+                            case 500:
+                                this.$.error.open();
+                                break;
+                        }
+                    }
+
+                }
+
+                window.customElements.define(Print.is, Print);
+            </script>
+        </dom-module>
+    </head>
+    <body unresolved>
+        <print-page></print-page>
+    </body>
+</html>

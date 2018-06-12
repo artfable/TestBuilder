@@ -12,10 +12,13 @@ import javax.persistence.*
 class CompletedTest(
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY) val id: Long? = null,
         val userId: Long = 0,
-        val testId: Long = 0,
+        val testId: Long? = null,
+        val nameSnapshot: String = "",
         val startTime: LocalDateTime = LocalDateTime.now(),
-        val points: Int = 0,
-        @ElementCollection(fetch = FetchType.EAGER)
-        @CollectionTable(name = "COMPLETED_QUESTIONS", joinColumns = [JoinColumn(name = "TEST_ID")])
+        var points: Int = 0,
+        @OneToMany(fetch = FetchType.EAGER)
+        @JoinColumn(name = "TEST_ID", referencedColumnName = "ID")
         val questions: List<CompletedQuestion> = ArrayList()
-)
+) {
+        constructor(testId: Long, nameSnapshot: String): this(testId = testId, nameSnapshot = nameSnapshot, id = null)
+}
