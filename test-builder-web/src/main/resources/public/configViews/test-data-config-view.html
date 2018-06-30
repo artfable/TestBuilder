@@ -6,9 +6,12 @@
 <link rel="import" href="../libs/polymer-elements/paper-input/paper-input.html">
 <link rel="import" href="../libs/polymer-elements/paper-input/paper-textarea.html">
 <link rel="import" href="../libs/polymer-elements/paper-dialog/paper-dialog.html">
+<link rel="import" href="../libs/polymer-elements/datetime-picker/time-picker.html">
 
 <link rel="import" href="../libs/polymer-elements/paper-styles/paper-styles.html">
 <link rel="import" href="../custom-styles.html">
+
+<script src="../libs/moment/min/moment.min.js"></script>
 
 <dom-module id="test-data-config-view">
     <link rel="import" type="css" href="../css/styles.css">
@@ -31,6 +34,10 @@
                 <paper-input label="Name" value="{{test.name}}"></paper-input>
                 <paper-textarea label="Description" value="{{test.description}}"></paper-textarea>
                 <paper-textarea label="Comment (not visible for no-admin users)" value="{{test.comment}}"></paper-textarea>
+                <div>
+                    Test duration:
+                    <time-picker time="{{testDurationStr}}" minute="{{testDuration.minutes}}" hour="{{testDuration.hours}}" parts-hidden="{{timeConfig}}" no-tip="true" auto-confirm="true" hide-now-button="true"></time-picker>
+                </div>
             </div>
             <div class="card-actions">
                 <paper-button class="success-btn" on-click="saveTest">Save</paper-button>
@@ -57,7 +64,16 @@
                         type: Object,
                         observer: '_onDataChanged'
                     },
-                    test: Object
+                    test: Object,
+                    testDurationStr: String,
+                    testDuration: Object,
+                    timeConfig: {
+                        type: Object,
+                        value: {
+                            second: true,
+                            millisecond: true
+                        }
+                    }
                 };
             }
 
@@ -66,6 +82,7 @@
             }
 
             saveTest() {
+                this.test.duration = moment.duration(this.testDuration).asMinutes();
                 this.$.updateTest.body = this.test;
                 this.$.updateTest.generateRequest();
             }
@@ -73,6 +90,11 @@
             _onDataChanged(data) {
                 if (data.type == TestDataConfigView.TYPE) {
                     this.test = data.element;
+                    let duration = moment.duration(data.element.duration, 'm');
+                    this.testDuration = {
+                        hours: duration.get('h'),
+                        minutes: duration.get('m')
+                    };
                 }
             }
 

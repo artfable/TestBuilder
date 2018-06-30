@@ -43,9 +43,11 @@ sass {
 build.dependsOn "compileSass"
 
 npm {
-    output = "$projectDir/src/main/resources/main/public/libs/"
+    output = "$projectDir/src/main/resources/public/libs/"
     dependencies = [
-            'js-md5': '0.7.3',
-//            'bootstrap': '>4'
+//            'js-md5': '0.7.3',
+//            '@fooloomanzoo/datetime-picker': '2.9.1'
+            'moment': '2.22.2'
     ]
+    excludes = ['@polymer/polymer']
 }

@@ -57,6 +57,7 @@ public class TestService {
         oldTest.setName(test.getName());
         oldTest.setComment(test.getComment());
         oldTest.setDescription(test.getDescription());
+        oldTest.setDuration(test.getDuration());
         return testRepository.saveAndFlush(oldTest);
     }
 }

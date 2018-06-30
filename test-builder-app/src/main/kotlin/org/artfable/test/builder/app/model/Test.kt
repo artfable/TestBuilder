@@ -14,6 +14,7 @@ data class Test(
         var name: String = "",
         var description: String = "",
         var comment: String = "",
+        var duration: Long = 0,
         @JsonIgnore
         @OneToMany(fetch = FetchType.LAZY)
         @JoinColumn(name = "TEST_ID", referencedColumnName = "ID")

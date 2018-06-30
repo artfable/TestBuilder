@@ -12,6 +12,7 @@
             <column name="NAME" type="varchar2(256)"/>
             <column name="description" type="varchar2(512)"/>
             <column name="comment" type="varchar2(1024)"/>
+            <column name="DURATION" type="BIGINT"/>
         </createTable>
     </changeSet>
 
@@ -54,15 +55,10 @@
             <column name="QUESTION_ID" type="BIGINT">
                 <constraints foreignKeyName="FK_QUESTIONS_ID"
                              referencedTableName="QUESTIONS"
-                             referencedColumnNames="ID"
-                             nullable="false"/>
+                             referencedColumnNames="ID"/>
             </column>
             <column name="TEXT" type="varchar2(256)"/>
             <column name="CORRECT" type="NUMBER(1)"/>
         </createTable>
-    </changeSet>
-
-    <changeSet id="app-model-3" author="artfable">
-        <dropNotNullConstraint tableName="ANSWERS" columnName="QUESTION_ID" columnDataType="BIGINT"/>
     </changeSet>
 </databaseChangeLog>
