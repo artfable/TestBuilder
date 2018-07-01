@@ -35,11 +35,6 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
     @Autowired
     private val userDetailsAuthenticationProvider: UserDetailsAuthenticationProvider? = null
 
-    @Bean
-    fun passwordEncoder(): BCryptPasswordEncoder {
-        return BCryptPasswordEncoder()
-    }
-
     @Autowired
     @Throws(Exception::class)
     fun configureGlobal(auth: AuthenticationManagerBuilder) {

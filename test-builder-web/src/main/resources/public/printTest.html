@@ -57,9 +57,14 @@
                             <template is="dom-repeat" items="[[group.questions]]" as="question">
                                 <h5>[[question.questionSnapshot]]</h5>
                                 <div class="answer-container">
-                                    <template is="dom-if" if="[[question.snapshotType == 'SINGLE']]">
+                                    <template is="dom-if" if="[[_isSingle(question.typeSnapshot)]]">
                                         <template is="dom-repeat" items="[[question.answers]]" as="answer">
                                             <paper-radio-button>[[answer.text]]</paper-radio-button>
+                                        </template>
+                                    </template>
+                                    <template is="dom-if" if="[[_isMultiple(question.typeSnapshot)]]">
+                                        <template is="dom-repeat" items="[[question.answers]]" as="answer">
+                                            <paper-checkbox>[[answer.text]]</paper-checkbox>
                                         </template>
                                     </template>
                                 </div>
@@ -96,6 +101,14 @@
                     _testIdChanged(route) {
                         this.testId = route.path;
                         this.$.getTestForPrint.generateRequest();
+                    }
+
+                    _isSingle(type) {
+                        return type == 'SINGLE';
+                    }
+
+                    _isMultiple(type) {
+                        return type == 'MULTIPLE';
                     }
 
                     _handleTest(event, response) {

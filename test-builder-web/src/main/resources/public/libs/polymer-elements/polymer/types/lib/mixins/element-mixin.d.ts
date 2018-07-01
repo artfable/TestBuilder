@@ -76,7 +76,7 @@ declare namespace Polymer {
    *   `observedAttributes` implementation will automatically return an array
    *   of dash-cased attributes based on `properties`)
    */
-  function ElementMixin<T extends new (...args: any[]) => {}>(base: T): T & ElementMixinConstructor & Polymer.PropertyEffectsConstructor & Polymer.PropertiesMixinConstructor;
+  function ElementMixin<T extends new (...args: any[]) => {}>(base: T): T & ElementMixinConstructor & Polymer.PropertyEffectsConstructor & Polymer.TemplateStampConstructor & Polymer.PropertyAccessorsConstructor & Polymer.PropertiesChangedConstructor & Polymer.PropertiesMixinConstructor;
 
   interface ElementMixinConstructor {
     new(...args: any[]): ElementMixin;
@@ -138,7 +138,7 @@ declare namespace Polymer {
     rootPath: string;
     importPath: string;
     root: StampedTemplate|HTMLElement|ShadowRoot|null;
-    $: {[key: string]: Element};
+    $: {[key: string]: _Element};
 
     /**
      * Stamps the element template.
@@ -198,6 +198,9 @@ declare namespace Polymer {
      *
      * These properties are retained unless a value of `null` is set.
      *
+     * Note: This function does not support updating CSS mixins.
+     * You can not dynamically change the value of an `@apply`.
+     *
      * @param properties Bag of custom property key/values to
      *   apply to this element.
      */
@@ -208,6 +211,10 @@ declare namespace Polymer {
      * the original location of the document containing the `dom-module` for
      * this element. This method will return the same URL before and after
      * bundling.
+     *
+     * Note that this function performs no resolution for URLs that start
+     * with `/` (absolute URLs) or `#` (hash identifiers).  For general purpose
+     * URL resolution, use `window.URL`.
      *
      * @param url URL to resolve.
      * @param base Optional base URL to resolve against, defaults

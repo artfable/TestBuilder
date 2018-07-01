@@ -1,5 +1,6 @@
 <link rel="import" href="../libs/polymer-elements/polymer/polymer-element.html">
 <link rel="import" href="../libs/polymer-elements/iron-ajax/iron-ajax.html">
+<link rel="import" href="../libs/polymer-elements/neon-animation/web-animations.html">
 
 <link rel="import" href="../libs/polymer-elements/paper-card/paper-card.html">
 <link rel="import" href="../libs/polymer-elements/paper-button/paper-button.html">
@@ -7,6 +8,9 @@
 <link rel="import" href="../libs/polymer-elements/paper-input/paper-textarea.html">
 <link rel="import" href="../libs/polymer-elements/paper-dialog/paper-dialog.html">
 <link rel="import" href="../libs/polymer-elements/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../libs/polymer-elements/paper-listbox/paper-listbox.html">
+<link rel="import" href="../libs/polymer-elements/paper-item/paper-item.html">
+<link rel="import" href="../libs/polymer-elements/paper-dropdown-menu/paper-dropdown-menu.html">
 
 <link rel="import" href="../libs/polymer-elements/paper-styles/paper-styles.html">
 <link rel="import" href="../custom-styles.html">
@@ -28,6 +32,9 @@
                 display: flex;
                 justify-content: flex-end;
             }
+            #answer_header {
+                margin-right: 1rem;
+            }
         </style>
 
         <paper-card>
@@ -35,7 +42,15 @@
                 <paper-input label="Question" value="{{question.text}}"></paper-input>
                 <paper-textarea label="Comment (not visible for no-admin users)" value="{{question.comment}}"></paper-textarea>
 
-                <h2>Answers</h2>
+                <div class="layout horizontal">
+                    <h2 id="answer_header">Answers</h2>
+                    <paper-dropdown-menu label="Answers type">
+                        <paper-listbox slot="dropdown-content" attr-for-selected="item-name" selected="{{question.type}}">
+                            <paper-item item-name="SINGLE">Only one allowed</paper-item>
+                            <paper-item item-name="MULTIPLE">Several</paper-item>
+                        </paper-listbox>
+                    </paper-dropdown-menu>
+                </div>
                 <table>
                     <thead>
                         <tr>
@@ -52,7 +67,7 @@
                         <template is="dom-repeat" items="{{answers}}">
                             <tr>
                                 <td>[[item.text]]</td>
-                                <td><paper-checkbox checked="{{item.correct}}"></paper-checkbox></td>
+                                <td><paper-checkbox on-click="_onSetCorrect" checked="{{item.correct}}"></paper-checkbox></td>
                                 <td>
                                     <paper-button class="table-btn remove-icon-btn" on-click="removeAnswer">
                                         <iron-icon icon="icons:delete-forever"></iron-icon>
@@ -76,6 +91,13 @@
             <div class="buttons">
                 <paper-button dialog-confirm on-click="_onSaveNewAnswer">Save</paper-button>
                 <paper-button dialog-dismiss>Close</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="typeNotAllowed" modal>
+            <p>You can't select single type as there're more than 1 answer that marked as correct.</p>
+            <div class="buttons">
+                <paper-button dialog-confirm autofocus>Close</paper-button>
             </div>
         </paper-dialog>
 
@@ -112,6 +134,12 @@
                 return "question";
             }
 
+            static get observers() {
+                return [
+                    '_typeChanged(question.type)',
+                ];
+            }
+
             saveQuestion() {
                 this.$.updateQuestion.body = this.question;
                 this.$.updateQuestion.body.answers = this.answers;
@@ -129,10 +157,24 @@
 
             _onDataChanged(data) {
                 if (data.type == QuestionDataConfigView.TYPE) {
+                    this.answers = []; // needed to prevent check with old answers
                     this.question = data.element;
                     this.testId = data.testId;
                     this.groupId = data.groupId;
                     this.$.getAnswers.generateRequest();
+                }
+            }
+
+            _typeChanged(type) {
+                if (type == 'SINGLE' && this.answers.filter(answer => answer.correct).length > 1) {
+                    this.set('question.type', 'MULTIPLE');
+                    this.$.typeNotAllowed.open();
+                }
+            }
+
+            _onSetCorrect() {
+                if (this.answers.filter(answer => answer.correct).length > 1) {
+                    this.set('question.type', 'MULTIPLE');
                 }
             }
 
