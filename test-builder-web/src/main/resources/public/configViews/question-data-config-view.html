@@ -151,6 +151,10 @@
                 this.$.createAnswerDialog.open();
             }
 
+            removeAnswer(event) {
+                this.splice('answers', this.answers.indexOf(event.model.item), 1);
+            }
+
             _onSaveNewAnswer() {
                 this.push('answers', this.newAnswer);
             }
